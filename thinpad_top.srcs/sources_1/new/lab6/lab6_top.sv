@@ -1,6 +1,6 @@
 `default_nettype none
 
-module lab5_top (
+module lab6_top (
     input wire clk_50M,     // 50MHz 时钟输入
     input wire clk_11M0592, // 11.0592MHz 时钟输入（备用，可不用）
 
@@ -126,26 +126,170 @@ module lab5_top (
   logic [ 3:0] wbm_sel_o;
   logic        wbm_we_o;
 
-  lab5_master #(
+  logic        if_wbm_cyc_o;
+  logic        if_wbm_stb_o;
+  logic        if_wbm_ack_i;
+  logic [31:0] if_wbm_adr_o;
+  logic [31:0] if_wbm_dat_o;
+  logic [31:0] if_wbm_dat_i;
+  logic [ 3:0] if_wbm_sel_o;
+  logic        if_wbm_we_o;
+
+  logic        mem_wbm_cyc_o;
+  logic        mem_wbm_stb_o;
+  logic        mem_wbm_ack_i;
+  logic [31:0] mem_wbm_adr_o;
+  logic [31:0] mem_wbm_dat_o;
+  logic [31:0] mem_wbm_dat_i;
+  logic [ 3:0] mem_wbm_sel_o;
+  logic        mem_wbm_we_o;
+
+  logic [31:0] imm_gen_o;
+  logic [4:0] imm_gen_type;
+  logic [31:0] imm_gen_i;
+
+  logic [31:0] alu_a, alu_b, alu_y;
+  logic [3:0] alu_op;
+
+  logic [31:0] if_alu_a, if_alu_b, if_alu_y;
+  logic [3:0] if_alu_op;
+
+  logic [4:0] rf_raddr_a, rf_raddr_b, rf_waddr;
+  logic [31:0] rf_rdata_b, rf_rdata_a, rf_wdata; 
+  logic rf_we;
+
+  wb_arbiter_2 #(
+    .DATA_WIDTH(32),
+    .ADDR_WIDTH(32),
+    .SELECT_WIDTH(4),
+    .ARB_TYPE_ROUND_ROBIN(0),
+    .ARB_LSB_HIGH_PRIORITY(1)
+  ) u_wb_arbiter2 (
+    .clk(sys_clk),
+    .rst(sys_rst),
+
+    .wbm0_adr_i(if_wbm_adr_o),
+    .wbm0_dat_i(if_wbm_dat_o),
+    .wbm0_dat_o(if_wbm_dat_i),
+    .wbm0_we_i(if_wbm_we_o),
+    .wbm0_sel_i(if_wbm_sel_o),
+    .wbm0_stb_i(if_wbm_stb_o),
+    .wbm0_ack_o(if_wbm_ack_i),
+    .wbm0_err_o(),
+    .wbm0_rty_o(),
+    .wbm0_cyc_i(if_wbm_cyc_o),
+
+    .wbm1_adr_i(mem_wbm_adr_o),
+    .wbm1_dat_i(mem_wbm_dat_o),
+    .wbm1_dat_o(mem_wbm_dat_i),
+    .wbm1_we_i(mem_wbm_we_o),
+    .wbm1_sel_i(mem_wbm_sel_o),
+    .wbm1_stb_i(mem_wbm_stb_o),
+    .wbm1_ack_o(mem_wbm_ack_i),
+    .wbm1_err_o(),
+    .wbm1_rty_o(),
+    .wbm1_cyc_i(mem_wbm_cyc_o),
+
+    .wbs_adr_o(wbm_adr_o),
+    .wbs_dat_i(wbm_dat_i),
+    .wbs_dat_o(wbm_dat_o),
+    .wbs_we_o (wbm_we_o),
+    .wbs_sel_o(wbm_sel_o),
+    .wbs_stb_o(wbm_stb_o),
+    .wbs_ack_i(wbm_ack_i),
+    .wbs_err_i('0),
+    .wbs_rty_i('0),
+    .wbs_cyc_o(wbm_cyc_o)
+  );
+
+  pipeline_master #(
       .ADDR_WIDTH(32),
       .DATA_WIDTH(32)
-  ) u_lab5_master (
+  ) u_lab6_master (
+      .leds(leds),
       .clk_i(sys_clk),
       .rst_i(sys_rst),
 
       // TODO: 添加需要的控制信号，例如按键开关？
-      .dip_sw(dip_sw),
+
       // wishbone master
-      .wb_cyc_o(wbm_cyc_o),
-      .wb_stb_o(wbm_stb_o),
-      .wb_ack_i(wbm_ack_i),
-      .wb_adr_o(wbm_adr_o),
-      .wb_dat_o(wbm_dat_o),
-      .wb_dat_i(wbm_dat_i),
-      .wb_sel_o(wbm_sel_o),
-      .wb_we_o (wbm_we_o)
+      .if_wb_cyc_o(if_wbm_cyc_o),
+      .if_wb_stb_o(if_wbm_stb_o),
+      .if_wb_ack_i(if_wbm_ack_i),
+      .if_wb_adr_o(if_wbm_adr_o),
+      .if_wb_dat_o(if_wbm_dat_o),
+      .if_wb_dat_i(if_wbm_dat_i),
+      .if_wb_sel_o(if_wbm_sel_o),
+      .if_wb_we_o(if_wbm_we_o),
+
+      .mem_wb_cyc_o(mem_wbm_cyc_o),
+      .mem_wb_stb_o(mem_wbm_stb_o),
+      .mem_wb_ack_i(mem_wbm_ack_i),
+      .mem_wb_adr_o(mem_wbm_adr_o),
+      .mem_wb_dat_o(mem_wbm_dat_o),
+      .mem_wb_dat_i(mem_wbm_dat_i),
+      .mem_wb_sel_o(mem_wbm_sel_o),
+      .mem_wb_we_o(mem_wbm_we_o),
+
+      // 连接 ALU 模块的信�??
+      .alu_a(alu_a),
+      .alu_b(alu_b),
+      .alu_op(alu_op),
+      .alu_y(alu_y),
+      .if_alu_a(if_alu_a),
+      .if_alu_b(if_alu_b),
+      .if_alu_op(if_alu_op),
+      .if_alu_y(if_alu_y),
+
+    //imm generator
+      .imm_gen_o(imm_gen_o),
+      .imm_gen_type_o(imm_gen_type),
+      .imm_gen_i(imm_gen_i),
+
+      // 连接寄存器堆模块的信�??
+    .rf_raddr_a(rf_raddr_a),
+    .rf_rdata_a(rf_rdata_a),
+    .rf_raddr_b(rf_raddr_b),
+    .rf_rdata_b(rf_rdata_b),
+    .rf_waddr(rf_waddr),
+    .rf_wdata(rf_wdata),
+    .rf_we(rf_we)
   );
 
+
+    imm_gen u_imm_gen (
+        .imm_gen_i(imm_gen_o),
+        .imm_gen_type_i(imm_gen_type),
+        .imm_gen_o(imm_gen_i)
+    );
+
+    alu32 u_alu(
+    .reset(sys_rst),
+    .alu_a(alu_a),
+    .alu_b(alu_b),
+    .alu_op(alu_op),
+    .alu_y_reg(alu_y)
+    );
+
+    alu32 u_if_alu(
+        .reset(sys_rst),
+        .alu_a(if_alu_a),
+        .alu_b(if_alu_b),
+        .alu_op(if_alu_op),
+        .alu_y_reg(if_alu_y)
+    );
+
+    regfile32 u_regfile(
+.clk(sys_clk),
+.reset(sys_rst),
+.waddr(rf_waddr),
+.wdata(rf_wdata),
+.we(rf_we),
+.raddr_a(rf_raddr_a),
+.rdata_a(rf_rdata_a),
+.raddr_b(rf_raddr_b),
+.rdata_b(rf_rdata_b)
+);
   /* =========== Lab5 Master end =========== */
 
   /* =========== Lab5 MUX begin =========== */

@@ -32,5 +32,97 @@ module sram_controller #(
 );
 
   // TODO: 实现 SRAM 控制器
+  typedef enum logic [2:0] {
+    STATE_IDLE = 0,
+    STATE_READ = 1,
+    STATE_READ_2 = 2,
+    STATE_WRITE = 3,
+    STATE_WRITE_2 = 4,
+    STATE_WRITE_3 = 5,
+    STATE_DONE = 6
+} state_t;
+
+state_t state;
+
+reg [31:0] sram_data_i_comb;
+reg [31:0] sram_data_o_comb;
+wire sram_data_t_comb;
+reg sram_data_t_reg;
+
+assign sram_data = sram_data_t_comb ? 32'bz : sram_data_o_comb;
+assign sram_data_i_comb = sram_data;
+assign sram_data_t_comb = sram_data_t_reg;
+
+always_ff @ (posedge clk_i) begin
+    if (rst_i) begin
+        state <= STATE_IDLE;
+        wb_ack_o <= 0;
+        sram_ce_n <= 1;
+        sram_oe_n <= 1;
+        sram_we_n <= 1;
+        sram_be_n <= 0;
+    end else begin
+        case (state)
+            STATE_IDLE: begin
+                wb_ack_o <= 0;
+                if (wb_stb_i && wb_cyc_i) begin
+                    if (wb_we_i) begin
+                        state <= STATE_WRITE;
+                        sram_addr <= wb_adr_i/4;//[:2];//除以4
+                        sram_oe_n <= 1;
+                        sram_ce_n <= 0;
+                        sram_we_n <= 1;
+                        sram_be_n <= ~wb_sel_i;//计算字节
+                        sram_data_t_reg <= 1;
+                    end else begin
+                        state <= STATE_READ;
+                        sram_addr <= wb_adr_i/4;//[:2];//除以4，截取
+                        sram_oe_n <= 0;
+                        sram_ce_n <= 0;
+                        sram_we_n <= 1;
+                        sram_be_n = 32'b0;//计算字节
+                        sram_data_t_reg <= 1;
+                    end
+                end
+            end
+            STATE_DONE: begin
+              state <= STATE_IDLE;
+              wb_ack_o <=  0;
+            end
+
+            STATE_READ: begin
+                state <= STATE_READ_2;
+            end
+            STATE_READ_2: begin
+              state <= STATE_DONE;
+              wb_dat_o <= sram_data_i_comb;
+              wb_ack_o <=  1;
+              sram_ce_n <= 1;
+              sram_oe_n <= 1;
+            end
+
+            STATE_WRITE: begin
+              state <= STATE_WRITE_2;
+              sram_we_n <= 0;
+              sram_data_t_reg <= 0;
+              sram_data_o_comb[7:0] <= sram_be_n[0]?sram_data_i_comb[7:0]:wb_dat_i[7:0];
+              sram_data_o_comb[15:8] <= sram_be_n[1]?sram_data_i_comb[15:8]:wb_dat_i[15:8];
+              sram_data_o_comb[23:16] <= sram_be_n[2]?sram_data_i_comb[23:16]:wb_dat_i[23:16];
+              sram_data_o_comb[31:24] <= sram_be_n[3]?sram_data_i_comb[31:24]:wb_dat_i[31:24];
+            end
+            STATE_WRITE_2: begin
+              state <= STATE_WRITE_3;
+              sram_we_n <= 1;
+              sram_data_t_reg <= 1;
+            end
+            STATE_WRITE_3: begin
+              state <= STATE_DONE;
+              wb_ack_o <=  1;
+              sram_ce_n <= 1;
+            end
+            // ...
+        endcase
+    end
+end
 
 endmodule
