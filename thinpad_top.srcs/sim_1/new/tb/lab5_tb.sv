@@ -38,8 +38,8 @@ module lab5_tb;
   wire uart_tsre;  // 数据发送完毕标志
 
   // Windows 需要注意路径分隔符的转义，例如 "D:\\foo\\bar.bin"
-  parameter BASE_RAM_INIT_FILE = "/tmp/main.bin"; // BaseRAM 初始化文件，请修改为实际的绝对路径
-  parameter EXT_RAM_INIT_FILE = "/tmp/eram.bin";  // ExtRAM 初始化文件，请修改为实际的绝对路径
+  parameter BASE_RAM_INIT_FILE = "E:\\rv-2022\\asmcode\\lab6.bin"; // BaseRAM 初始化文件，请修改为实际的绝对路径
+  parameter EXT_RAM_INIT_FILE = "E:\\1.txt";  // ExtRAM 初始化文件，请修改为实际的绝对路径
 
   initial begin
     // 在这里可以自定义测试输入序列，例如：
@@ -50,9 +50,9 @@ module lab5_tb;
 
     #100;
     reset_btn = 1;
-    #100;
+    #200;
     reset_btn = 0;
-
+    #500000 $finish;
     // TODO: 根据实验的操作要求，自定义下面的输入序列
     for (integer i = 0; i < 20; i = i + 1) begin
       #100;  // 等待 100ns
@@ -73,7 +73,7 @@ module lab5_tb;
   end
 
   // 待测试用户设计
-  lab5_top dut (
+  lab6_top dut (
       .clk_50M(clk_50M),
       .clk_11M0592(clk_11M0592),
       .push_btn(push_btn),

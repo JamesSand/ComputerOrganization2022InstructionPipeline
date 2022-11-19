@@ -68,8 +68,69 @@ module lab3_tb;
       #1000;
     end
 
-    // TODO: 随机测试各种指令
+    // for (int i = 1; i < 32; i = i + 1) begin
+    //   #100
+    //   rd = i;
+    //   dip_sw = `inst_peek(rd, $urandom_range(0, 65536));
+    //   push_btn = 1;
 
+    //   #100;
+    //   push_btn = 0;
+
+    //   #1000;
+    // end
+    // TODO: 随机测试各种指令
+      // dip_sw = `inst_poke(2, 16'hbab3);
+      // push_btn = 1;
+
+      // #100;
+      // push_btn = 0;
+
+      // #1000;
+      // dip_sw = `inst_poke(3,16'h5);
+      // push_btn = 1;
+
+      // #100;
+      // push_btn = 0;
+      for (int i = 1; i < 3; i = i + 1) begin
+      #100;
+      rd = i;   // only lower 5 bits
+      dip_sw = `inst_poke(rd, $urandom_range(0, 65536));
+      push_btn = 1;
+
+      #100;
+      push_btn = 0;
+
+      #1000;
+    end
+      dip_sw = `inst_peek(5'b0001, $urandom_range(0, 65536));
+      push_btn = 1;
+
+      #100;
+      push_btn = 0;
+
+      #1000;
+      #1000;
+      dip_sw = `inst_rtype(5'b0001,5'b0001,5'b0010,4'b0001);
+      #200
+      push_btn = 1;
+
+      #200;
+      push_btn = 0;
+    #4000
+    // dip_sw = `inst_peek(5'b0001, $urandom_range(0, 65536));
+    //   push_btn = 1;
+
+    //   #100;
+    //   push_btn = 0;
+
+      #1000;
+    //   #1000;
+    // dip_sw = `inst_rtype(2,2,3,4'b0001);
+    //   push_btn = 1;
+
+    //   #100;
+    //   push_btn = 0;
     #10000 $finish;
   end
 
