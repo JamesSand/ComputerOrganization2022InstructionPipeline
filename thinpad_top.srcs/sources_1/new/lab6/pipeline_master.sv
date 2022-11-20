@@ -68,6 +68,7 @@ reg [31:0]  if_id_id_inst_reg;
 reg id_stall_i,id_stall_o,id_flush_i,id_flush_o;
 reg [31:0]  id_exe_if_branch_addr_reg;
 reg id_exe_if_branch_reg;
+reg id_exe_id_branchequ;
 
 reg [31:0]  id_exe_exe_alu_a_reg;
 reg [31:0]  id_exe_exe_alu_b_reg;
@@ -227,7 +228,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_load_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
-        end else if (if_id_id_inst_reg[6:0] == 7'b1100011) begin // beq
+        end else if (if_id_id_inst_reg[6:0] == 7'b1100011 && if_id_id_inst_reg[14:12] == 3'b000) begin // beq
             id_exe_if_branch_reg <= 1;
             id_exe_if_branch_addr_reg <= if_alu_y;
             id_exe_exe_alu_a_reg <= rf_rdata_a;
@@ -241,7 +242,23 @@ always_ff @ (posedge clk_i) begin
             id_exe_wb_rf_we_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 0;
             id_exe_rd_reg <= 0;
-        end else if (if_id_id_inst_reg[6:0] == 7'b0000011) begin // lb
+            id_exe_id_branchequ <= 1;
+        end else if (if_id_id_inst_reg[6:0] == 7'b1100011 && if_id_id_inst_reg[14:12] == 3'b001) begin // bne
+            id_exe_if_branch_reg <= 1;
+            id_exe_if_branch_addr_reg <= if_alu_y;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= rf_rdata_b;
+            id_exe_exe_alu_op_reg <= `ALU_OP_SUB;
+            id_exe_mem_wb_cyc_reg <= 0;
+            id_exe_mem_wb_stb_reg <= 0;
+            id_exe_mem_wb_we_reg <= 0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_wb_rf_we_reg <= 0;
+            id_exe_exe_rfstorealuy_reg <= 0;
+            id_exe_rd_reg <= 0;
+            id_exe_id_branchequ <= 0;
+        end else if (if_id_id_inst_reg[6:0] == 7'b0000011 && if_id_id_inst_reg[14:12] == 3'b000) begin // lb
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
@@ -249,6 +266,21 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_wb_cyc_reg <= 1'b1;
             id_exe_mem_wb_stb_reg <= 1'b1;
             id_exe_mem_wb_sel_reg <= 4'b0001;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 1;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= imm_gen_i;
+            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if (if_id_id_inst_reg[6:0] == 7'b0000011 && if_id_id_inst_reg[14:12] == 3'b010) begin // lw
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b0;
+            id_exe_mem_wb_cyc_reg <= 1'b1;
+            id_exe_mem_wb_stb_reg <= 1'b1;
+            id_exe_mem_wb_sel_reg <= 4'b1111;
             id_exe_mem_wb_we_reg <= 1'b0;
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 1;
@@ -314,7 +346,63 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_alu_b_reg <= imm_gen_i;
             id_exe_exe_alu_op_reg <= `ALU_OP_AND;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
-        end else if (if_id_id_inst_reg[6:0] == 7'b0110011) begin // add
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b001)) begin // slli
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= imm_gen_i;
+            id_exe_exe_alu_op_reg <= `ALU_OP_SLL;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b101)) begin // srli
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= imm_gen_i;
+            id_exe_exe_alu_op_reg <= `ALU_OP_SRL;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b110)) begin // ori
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= imm_gen_i;
+            id_exe_exe_alu_op_reg <= `ALU_OP_OR;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b111)) begin // and
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= rf_rdata_b;
+            id_exe_exe_alu_op_reg <= `ALU_OP_AND;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b000)) begin // add
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
@@ -327,6 +415,34 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_alu_a_reg <= rf_rdata_a;
             id_exe_exe_alu_b_reg <= rf_rdata_b;
             id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b110)) begin // or
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= rf_rdata_b;
+            id_exe_exe_alu_op_reg <= `ALU_OP_OR;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b100)) begin // xor
+            id_exe_if_branch_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1'b1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a;
+            id_exe_exe_alu_b_reg <= rf_rdata_b;
+            id_exe_exe_alu_op_reg <= `ALU_OP_XOR;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else begin 
             id_exe_if_branch_reg <= 0;
@@ -352,11 +468,11 @@ always_comb begin
         imm_gen_type_o = `TYPE_U;
         have_rs1 = 0;
         have_rs2 = 0;
-    end else if (if_id_id_inst_reg[6:0] == 7'b1100011) begin // beq
+    end else if (if_id_id_inst_reg[6:0] == 7'b1100011) begin // beq bne
         imm_gen_type_o = `TYPE_B;
         have_rs1 = 1;
         have_rs2 = 1;
-    end else if (if_id_id_inst_reg[6:0] == 7'b0000011) begin // lb
+    end else if (if_id_id_inst_reg[6:0] == 7'b0000011) begin // lb lw
         imm_gen_type_o = `TYPE_I;
         have_rs1 = 1;
         have_rs2 = 0;
@@ -364,11 +480,11 @@ always_comb begin
         imm_gen_type_o = `TYPE_S;
         have_rs1 = 1;
         have_rs2 = 1;
-    end else if (if_id_id_inst_reg[6:0] == 7'b0010011) begin // addi andi
+    end else if (if_id_id_inst_reg[6:0] == 7'b0010011) begin // addi andi slli srli ori
         imm_gen_type_o = `TYPE_I;
         have_rs1 = 1;
         have_rs2 = 0;
-    end else if (if_id_id_inst_reg[6:0] == 7'b0110011) begin // add
+    end else if (if_id_id_inst_reg[6:0] == 7'b0110011) begin // add and or xor
         imm_gen_type_o = `TYPE_R;
         have_rs1 = 1;
         have_rs2 = 1;
@@ -415,7 +531,11 @@ always_ff @ (posedge clk_i) begin
         exe_if_if_branch_compcompute <= 0;
     end else begin
         if (id_exe_if_branch_reg)begin
-            exe_if_if_branch_successornot_reg <=  (alu_y == 0);
+            if (id_exe_id_branchequ) begin
+                exe_if_if_branch_successornot_reg <=  (alu_y == 0);
+            end else begin
+                exe_if_if_branch_successornot_reg <=  (alu_y != 0);
+            end
             exe_if_if_branch_compcompute <= 1;
             exe_if_if_branch_addr_reg <=  id_exe_if_branch_addr_reg;
             // if (alu_y == 0)begin
@@ -485,12 +605,11 @@ always_ff @ (posedge clk_i) begin
                 mem_wb_wb_rf_waddr_ack_reg <= mem_wb_wb_rf_waddr_start_reg;
                 mem_wb_wb_rf_we_ack_reg <= mem_wb_wb_rf_we_start_reg;
                 mem_wb_rd_ack_reg <= mem_wb_rd_start_reg;
-                // if (exe_mem_mem_load_reg)begin
+                if (mem_wb_sel_o==4'b1)begin
                     mem_wb_wb_rf_wdata_ack_reg <= {{24{mem_wb_dat_i[7]}},mem_wb_dat_i[7:0]};//lb
-                // end
-                // else if (exe_mem_mem_store_reg)begin
-                    // mem_wb_wb_rf_wdata_ack_reg <= mem_wb_wb_rf_wdata_start_reg;
-                // end
+                end else begin//lw
+                    mem_wb_wb_rf_wdata_ack_reg <= mem_wb_dat_i;
+                end
             end else begin
                 mem_wb_cyc_o <= exe_mem_mem_wb_cyc_reg;
                 mem_wb_stb_o <= exe_mem_mem_wb_stb_reg;
