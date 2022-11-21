@@ -696,8 +696,14 @@ always_ff @ (posedge clk_i) begin
                 mem_wb_wb_rf_waddr_ack_reg <= mem_wb_wb_rf_waddr_start_reg;
                 mem_wb_wb_rf_we_ack_reg <= mem_wb_wb_rf_we_start_reg;
                 mem_wb_rd_ack_reg <= mem_wb_rd_start_reg;
-                if (mem_wb_sel_o==4'b1)begin
+                if (mem_wb_sel_o==4'b0001)begin
                     mem_wb_wb_rf_wdata_ack_reg <= {{24{mem_wb_dat_i[7]}},mem_wb_dat_i[7:0]};//lb
+                end else if (mem_wb_sel_o == 4'b0010) begin
+                    mem_wb_wb_rf_wdata_ack_reg <= {{24{mem_wb_dat_i[15]}},mem_wb_dat_i[15:8]};//lb
+                end else if (mem_wb_sel_o == 4'b0100) begin
+                    mem_wb_wb_rf_wdata_ack_reg <= {{24{mem_wb_dat_i[23]}},mem_wb_dat_i[23:16]};//lb
+                end else if (mem_wb_sel_o == 4'b1000) begin
+                    mem_wb_wb_rf_wdata_ack_reg <= {{24{mem_wb_dat_i[31]}},mem_wb_dat_i[31:24]};//lb
                 end else begin//lw
                     mem_wb_wb_rf_wdata_ack_reg <= mem_wb_dat_i;
                 end
