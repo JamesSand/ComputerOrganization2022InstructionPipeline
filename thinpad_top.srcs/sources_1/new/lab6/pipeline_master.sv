@@ -639,10 +639,21 @@ always_ff @ (posedge clk_i) begin
         exe_mem_mem_wb_cyc_reg <= id_exe_mem_wb_cyc_reg;
         exe_mem_mem_wb_stb_reg <= id_exe_mem_wb_stb_reg;
         exe_mem_mem_wb_we_reg <= id_exe_mem_wb_we_reg;
-        exe_mem_mem_wb_sel_reg <= id_exe_mem_wb_sel_reg;
+        // exe_mem_mem_wb_sel_reg <= id_exe_mem_wb_sel_reg;
         exe_mem_mem_wb_dat_reg <= id_exe_mem_wb_dat_reg;
         if (id_exe_mem_load_reg||id_exe_mem_store_reg) begin
             exe_mem_mem_wb_adr_reg <= alu_y;
+            if (id_exe_mem_wb_sel_reg == 4'b1111) begin
+                exe_mem_mem_wb_sel_reg <= id_exe_mem_wb_sel_reg;
+            end else begin
+                case(alu_y[1:0])
+                    2'b00 : exe_mem_mem_wb_sel_reg<=4'b0001;
+                    2'b01 : exe_mem_mem_wb_sel_reg<=4'b0010;
+                    2'b10 : exe_mem_mem_wb_sel_reg<=4'b0100;
+                    2'b11 : exe_mem_mem_wb_sel_reg<=4'b1000;
+                    default:exe_mem_mem_wb_sel_reg<=0;
+                endcase
+            end
         end
     end
 end
