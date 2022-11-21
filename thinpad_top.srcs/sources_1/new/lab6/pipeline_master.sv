@@ -171,7 +171,7 @@ always_comb begin
 
     if_wb_adr_o = if_pc_reg;
     if_wb_sel_o = 4'b1111;
-    if (if_id_id_inst_reg[6:0] == 7'b1100011) begin//用stall
+    if (if_id_id_inst_reg[6:0] == 7'b1100011) begin//用stall, branch instruction !!!
         if_alu_a = if_id_id_pc_now_reg;
         if_alu_b = imm_gen_i;
         if_alu_op = `ALU_OP_ADD;
@@ -228,6 +228,26 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_load_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if (if_id_id_inst_reg[6:0] == 7'b0010111) begin // auipc
+            // if_id_id_inst_reg[6:0] is opcode
+            id_exe_if_branch_reg <= 0; // not a branch instruction
+            id_exe_wb_rf_we_reg <= 1'b1; // write reg in wb stage
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // wb stage reg addr
+            id_exe_exe_rfstorealuy_reg <= 1'b1;  // rf store from alu y !!!
+
+            // close wishbone signal in wb stage
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+
+            // alu stage
+            id_exe_exe_alu_a_reg <= if_id_id_pc_now_reg;
+            id_exe_exe_alu_b_reg <= imm_gen_i;
+            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // what is this !!!
+
         end else if (if_id_id_inst_reg[6:0] == 7'b1100011 && if_id_id_inst_reg[14:12] == 3'b000) begin // beq
             id_exe_if_branch_reg <= 1;
             id_exe_if_branch_addr_reg <= if_alu_y;
@@ -468,6 +488,10 @@ always_comb begin
         imm_gen_type_o = `TYPE_U;
         have_rs1 = 0;
         have_rs2 = 0;
+    end else if (if_id_id_inst_reg[6:0] == 7'b0010111) begin // auipc
+        imm_gen_type_o = `TYPE_U;
+        have_rs1 = 0;
+        have_rs2 = 0;
     end else if (if_id_id_inst_reg[6:0] == 7'b1100011) begin // beq bne
         imm_gen_type_o = `TYPE_B;
         have_rs1 = 1;
@@ -548,7 +572,7 @@ always_ff @ (posedge clk_i) begin
         end
         exe_mem_wb_rf_we_reg <= id_exe_wb_rf_we_reg;
         exe_mem_wb_rf_waddr_reg <= id_exe_wb_rf_waddr_reg;
-        exe_mem_rd_reg <= id_exe_rd_reg;
+        exe_mem_rd_reg <= id_exe_rd_reg; // pass it to next stage
         if (id_exe_exe_rfstorealuy_reg) begin   // 要将alu计算结果放进寄存器堆的情�??????????
             exe_mem_wb_rf_wdata_reg <= alu_y;
         end else begin
@@ -591,7 +615,7 @@ always_ff @ (posedge clk_i) begin
             mem_wb_wb_rf_waddr_ack_reg <= exe_mem_wb_rf_waddr_reg;
             mem_wb_wb_rf_wdata_ack_reg <= exe_mem_wb_rf_wdata_reg;
             mem_wb_wb_rf_we_ack_reg <= exe_mem_wb_rf_we_reg;
-            mem_wb_rd_ack_reg <= exe_mem_rd_reg;
+            mem_wb_rd_ack_reg <= exe_mem_rd_reg; // this is the case donot need mem, and here we pass it again, seems that we will not pass it later. So what does it use for !!!
             // mem_wb_cyc_o <= 0;
             // mem_wb_stb_o <= 0;
             // mem_wb_we_o <= 0;
