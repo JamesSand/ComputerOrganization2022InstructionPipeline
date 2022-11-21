@@ -14,8 +14,8 @@ always_comb begin
         4'b0100: alu_y_reg = alu_a | alu_b;
         4'b0101: alu_y_reg = alu_a ^ alu_b;
         4'b0110: alu_y_reg = ~ alu_a;
-        // 4'b0111: alu_y_reg = alu_a << (alu_b)%16;
-        // 4'b1000: alu_y_reg = alu_a >> (alu_b)%16;
+        4'b0111: alu_y_reg = alu_a << (alu_b)%32;
+        4'b1000: alu_y_reg = alu_a >> (alu_b)%32;
         // 4'b1001: begin
         //     alu_y_reg = alu_a >> (alu_b)%16;
         //     temp_reg = 17'h10000;
