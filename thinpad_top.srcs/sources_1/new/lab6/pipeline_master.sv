@@ -69,6 +69,7 @@ reg id_stall_i,id_stall_o,id_flush_i,id_flush_o;
 reg [31:0]  id_exe_if_branch_addr_reg;
 reg id_exe_if_branch_reg;
 reg id_exe_id_branchequ;
+reg id_exe_exe_isjump_reg;
 
 reg [31:0]  id_exe_exe_alu_a_reg;
 reg [31:0]  id_exe_exe_alu_b_reg;
@@ -171,13 +172,17 @@ always_comb begin
 
     if_wb_adr_o = if_pc_reg;
     if_wb_sel_o = 4'b1111;
-    if (if_id_id_inst_reg[6:0] == 7'b1100011) begin//用stall, branch instruction !!!
+    if (if_id_id_inst_reg[6:0] == 7'b1100011 || if_id_id_inst_reg[6:0] == 7'b1101111) begin // beq bne jal
         if_alu_a = if_id_id_pc_now_reg;
         if_alu_b = imm_gen_i;
         if_alu_op = `ALU_OP_ADD;
         if_flush_o = 1;
-    end
-    else begin
+    end else if (if_id_id_inst_reg[6:0] == 7'b1100111) begin // jalr
+        if_alu_a = rf_rdata_a;
+        if_alu_b = imm_gen_i;
+        if_alu_op = `ALU_OP_ADD;
+        if_flush_o = 1;
+    end else begin
         if_alu_a = if_pc_reg;
         if_alu_b = 32'h0000_0004;
         if_alu_op =`ALU_OP_ADD;
@@ -263,6 +268,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_rfstorealuy_reg <= 0;
             id_exe_rd_reg <= 0;
             id_exe_id_branchequ <= 1;
+            id_exe_exe_isjump_reg <= 0;
         end else if (if_id_id_inst_reg[6:0] == 7'b1100011 && if_id_id_inst_reg[14:12] == 3'b001) begin // bne
             id_exe_if_branch_reg <= 1;
             id_exe_if_branch_addr_reg <= if_alu_y;
@@ -278,6 +284,39 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_rfstorealuy_reg <= 0;
             id_exe_rd_reg <= 0;
             id_exe_id_branchequ <= 0;
+            id_exe_exe_isjump_reg <= 0;
+        end else if (if_id_id_inst_reg[6:0] == 7'b1101111) begin // jal
+            id_exe_if_branch_reg <= 1;
+            id_exe_if_branch_addr_reg <= if_alu_y;
+            id_exe_exe_alu_a_reg <= if_id_id_pc_now_reg;
+            id_exe_exe_alu_b_reg <= 32'h0000_0004;
+            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_mem_wb_cyc_reg <= 0;
+            id_exe_mem_wb_stb_reg <= 0;
+            id_exe_mem_wb_we_reg <= 0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1;
+            id_exe_exe_rfstorealuy_reg <= 1;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+            id_exe_id_branchequ <= 0;
+            id_exe_exe_isjump_reg <= 1;
+        end else if (if_id_id_inst_reg[6:0] == 7'b1100111) begin // jalr
+            id_exe_if_branch_reg <= 1;
+            id_exe_if_branch_addr_reg <= if_alu_y;
+            id_exe_exe_alu_a_reg <= if_id_id_pc_now_reg;
+            id_exe_exe_alu_b_reg <= 32'h0000_0004;
+            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_mem_wb_cyc_reg <= 0;
+            id_exe_mem_wb_stb_reg <= 0;
+            id_exe_mem_wb_we_reg <= 0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_wb_rf_we_reg <= 1;
+            id_exe_exe_rfstorealuy_reg <= 1;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+            id_exe_id_branchequ <= 0;
+            id_exe_exe_isjump_reg <= 1;
         end else if (if_id_id_inst_reg[6:0] == 7'b0000011 && if_id_id_inst_reg[14:12] == 3'b000) begin // lb
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b1;
@@ -555,7 +594,9 @@ always_ff @ (posedge clk_i) begin
         exe_if_if_branch_compcompute <= 0;
     end else begin
         if (id_exe_if_branch_reg)begin
-            if (id_exe_id_branchequ) begin
+            if (id_exe_exe_isjump_reg) begin
+                exe_if_if_branch_successornot_reg <= 1;
+            end else if (id_exe_id_branchequ) begin
                 exe_if_if_branch_successornot_reg <=  (alu_y == 0);
             end else begin
                 exe_if_if_branch_successornot_reg <=  (alu_y != 0);
