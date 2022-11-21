@@ -265,6 +265,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
             id_exe_wb_rf_we_reg <= 0;
+            id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 0;
             id_exe_rd_reg <= 0;
             id_exe_id_branchequ <= 1;
@@ -281,6 +282,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
             id_exe_wb_rf_we_reg <= 0;
+            id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 0;
             id_exe_rd_reg <= 0;
             id_exe_id_branchequ <= 0;
@@ -297,6 +299,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
             id_exe_wb_rf_we_reg <= 1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
             id_exe_id_branchequ <= 0;
@@ -313,6 +316,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
             id_exe_wb_rf_we_reg <= 1;
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
             id_exe_id_branchequ <= 0;
@@ -350,6 +354,7 @@ always_ff @ (posedge clk_i) begin
         end else if ((if_id_id_inst_reg[6:0] == 7'b0100011) && (if_id_id_inst_reg[14:12] == 3'b000)) begin // sb
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b0;
+            id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
             id_exe_mem_wb_cyc_reg <= 1'b1;
             id_exe_mem_wb_stb_reg <= 1'b1;
@@ -365,6 +370,7 @@ always_ff @ (posedge clk_i) begin
         end else if ((if_id_id_inst_reg[6:0] == 7'b0100011) && (if_id_id_inst_reg[14:12] == 3'b010)) begin // sw
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b0;
+            id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
             id_exe_mem_wb_cyc_reg <= 1'b1;
             id_exe_mem_wb_stb_reg <= 1'b1;
@@ -514,6 +520,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_load_reg <= 0;
             id_exe_mem_store_reg <= 0;
             id_exe_wb_rf_we_reg <= 0;
+            id_exe_wb_rf_waddr_reg <= 0;
             id_exe_rd_reg <= 0;
         end
     end
