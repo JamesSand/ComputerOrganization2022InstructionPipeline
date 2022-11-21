@@ -27,7 +27,7 @@ always_comb begin
         imm_gen_o = {{20{imm_gen_i[31]}},imm_gen_i[31:25],imm_gen_i[11:7]};
     end
     `TYPE_J: begin
-        imm_gen_o = {{11{imm_gen_i[31]}},imm_gen_i[31],imm_gen_i[19:12], imm_gen_i[20], imm_gen_i[30:21]};
+        imm_gen_o = {{11{imm_gen_i[31]}},imm_gen_i[31],imm_gen_i[19:12], imm_gen_i[20], imm_gen_i[30:21], 0};
     end
 
     default: imm_gen_o = 0;
