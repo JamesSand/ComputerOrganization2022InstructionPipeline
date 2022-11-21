@@ -535,6 +535,14 @@ always_comb begin
         imm_gen_type_o = `TYPE_B;
         have_rs1 = 1;
         have_rs2 = 1;
+    end else if (if_id_id_inst_reg[6:0] == 7'b1101111) begin // jal
+        imm_gen_type_o = `TYPE_J;
+        have_rs1 = 0;
+        have_rs2 = 0;
+    end else if (if_id_id_inst_reg[6:0] == 7'b1100111) begin // jalr
+        imm_gen_type_o = `TYPE_I;
+        have_rs1 = 1;
+        have_rs2 = 0;
     end else if (if_id_id_inst_reg[6:0] == 7'b0000011) begin // lb lw
         imm_gen_type_o = `TYPE_I;
         have_rs1 = 1;
