@@ -453,6 +453,20 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_alu_b_reg <= imm_gen_i;
             id_exe_exe_alu_op_reg <= `ALU_OP_OR;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
+        end else if((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b011)) begin // sltu
+            id_exe_if_branch_reg <= 0; // not a branch command
+            id_exe_wb_rf_we_reg <= 1'b1; // write back register
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
+            id_exe_exe_rfstorealuy_reg <= 1'b1; // we do need to restore from alu_y
+            id_exe_mem_wb_cyc_reg <= 1'b0; // do not read from wishbone
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 1'b0;
+            id_exe_exe_alu_a_reg <= rf_rdata_a; // rs1
+            id_exe_exe_alu_b_reg <= rf_rdata_b; // rs2
+            id_exe_exe_alu_op_reg <= `ALU_OP_AND;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // some magic reg by plf
         end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b111)) begin // and
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b1;

@@ -11,6 +11,7 @@
 `define ALU_OP_SRA         4'd9
 `define ALU_OP_ROL         4'd10
 `define ALU_OP_SETB        4'd11 //for lui
+`define ALU_OP_SLTU        4'd12 // for sltu
 
 `define TYPE_R 5'd12
 `define TYPE_I 5'd13
