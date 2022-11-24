@@ -229,6 +229,7 @@ always_ff @ (posedge clk_i) begin
         id_exe_mem_wb_we_reg <= 0;
         id_exe_mem_load_reg <= 0;
         id_exe_mem_store_reg <= 0;
+        id_exe_wb_csr_we_reg <= 0;
         id_exe_wb_rf_we_reg <= 0;
         id_exe_rd_reg <= 0;
     end else if (id_stall_i) begin
@@ -243,6 +244,7 @@ always_ff @ (posedge clk_i) begin
         id_exe_mem_wb_we_reg <= 0;
         id_exe_mem_load_reg <= 0;
         id_exe_mem_store_reg <= 0;
+        id_exe_wb_csr_we_reg <= 0;
         id_exe_wb_rf_we_reg <= 0;
         id_exe_rd_reg <= 0;
         // csr
@@ -726,6 +728,7 @@ always_ff @ (posedge clk_i) begin
         exe_mem_mem_wb_we_reg <= 0;
         exe_mem_mem_load_reg <= 0;
         exe_mem_mem_store_reg <= 0;
+        exe_mem_wb_csr_we_reg <= 0;
         exe_mem_wb_rf_we_reg <= 0;
         exe_mem_rd_reg <= 0;
         exe_if_if_branch_successornot_reg <= 0;
@@ -816,6 +819,7 @@ end
 //mem
 always_ff @ (posedge clk_i) begin
     if (rst_i) begin
+        mem_wb_wb_csr_we_reg <= 0;
         mem_wb_wb_rf_we_ack_reg <= 0;
         mem_wb_cyc_o <= 0;
         mem_wb_stb_o <= 0;
@@ -823,6 +827,7 @@ always_ff @ (posedge clk_i) begin
         mem_wb_rd_ack_reg <= 0;
     end else if (mem_stall_i) begin
     end else if (mem_flush_i) begin
+        mem_wb_wb_csr_we_reg <= 0;
         mem_wb_wb_rf_we_ack_reg <= 0;
         mem_wb_wb_csr_we_reg <= 0;
         mem_wb_rd_ack_reg <= 0;
