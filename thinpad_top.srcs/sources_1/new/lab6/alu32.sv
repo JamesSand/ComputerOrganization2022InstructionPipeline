@@ -7,7 +7,7 @@ output reg [31:0] alu_y_reg
 );
 
 always_comb begin
-        casez(alu_op)
+        case(alu_op)
         4'b0001: alu_y_reg = alu_a + alu_b;
         4'b0010: alu_y_reg = alu_a - alu_b;
         4'b0011: alu_y_reg = alu_a & alu_b;
@@ -25,6 +25,12 @@ always_comb begin
                 end else begin
                         alu_y_reg = 1'b0;
                 end
+        end
+        4'b1101 : begin // csrrs
+                alu_y_reg = alu_a | alu_b;
+        end
+        4'b1110 : begin // csrrw
+                alu_y_reg = alu_a & (~alu_b);
         end
         // end code of szz
 
