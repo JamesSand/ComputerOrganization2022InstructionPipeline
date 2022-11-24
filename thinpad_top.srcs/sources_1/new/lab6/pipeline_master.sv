@@ -266,9 +266,9 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
 
-            // TODO: set csr we reg = in other cases
             // write csr
             id_exe_wb_csr_we_reg <= 1'b1;
+            id_exe_exe_csrstorealuy_reg <= 1'b0;
             id_exe_wb_csr_wdata_reg <= rf_rdata_a;
             id_exe_wb_csr_waddr_reg <= if_id_id_inst_reg[31:20];
 
@@ -277,6 +277,28 @@ always_ff @ (posedge clk_i) begin
 
         end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b010) begin // csrrs
             // csrrs, set corresponding position as 1
+            // id_exe_if_branch_reg <= 0;
+
+            // // write rd
+            // id_exe_wb_rf_we_reg <= 1'b1; // write reg back
+            // id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // rd register in instruction
+            // id_exe_exe_rfstorealuy_reg <= 1'b0; // donot restore from alu
+            // id_exe_wb_rf_wdata_reg <= csr_rdata_a;
+
+            // // close wishbone signal in wb stage
+            // id_exe_mem_wb_cyc_reg <= 1'b0;
+            // id_exe_mem_wb_stb_reg <= 1'b0;
+            // id_exe_mem_wb_we_reg <= 1'b0;
+            // id_exe_mem_store_reg <= 1'b0;
+            // id_exe_mem_load_reg <= 0;
+
+            // // write csr
+            // id_exe_wb_csr_we_reg <= 1'b1;
+            // id_exe_wb_csr_wdata_reg <= rf_rdata_a;
+            // id_exe_wb_csr_waddr_reg <= if_id_id_inst_reg[31:20];
+
+            // // we donot care alu here
+            // id_exe_rd_reg <= if_id_id_inst_reg[11:7];
             
         end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b011) begin // csrrc
             // csrrc set the corresponding position 0
