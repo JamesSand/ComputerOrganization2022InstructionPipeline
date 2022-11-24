@@ -284,6 +284,7 @@ always_ff @ (posedge clk_i) begin
 
         end else if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_wb_rf_wdata_reg <= imm_gen_i;
@@ -297,6 +298,7 @@ always_ff @ (posedge clk_i) begin
         end else if (if_id_id_inst_reg[6:0] == 7'b0010111) begin // auipc
             // if_id_id_inst_reg[6:0] is opcode
             id_exe_if_branch_reg <= 0; // not a branch instruction
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1; // write reg in wb stage
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // wb stage reg addr
             id_exe_exe_rfstorealuy_reg <= 1'b1;  // rf store from alu y !!!
@@ -325,6 +327,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_wb_we_reg <= 0;
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 0;
             id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 0;
@@ -342,6 +345,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_wb_we_reg <= 0;
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 0;
             id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 0;
@@ -359,6 +363,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_wb_we_reg <= 0;
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1;
@@ -376,6 +381,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_wb_we_reg <= 0;
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1;
@@ -384,6 +390,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_isjump_reg <= 1;
         end else if (if_id_id_inst_reg[6:0] == 7'b0000011 && if_id_id_inst_reg[14:12] == 3'b000) begin // lb
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b0;
@@ -399,6 +406,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if (if_id_id_inst_reg[6:0] == 7'b0000011 && if_id_id_inst_reg[14:12] == 3'b010) begin // lw
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b0;
@@ -414,6 +422,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0100011) && (if_id_id_inst_reg[14:12] == 3'b000)) begin // sb
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b0;
             id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
@@ -430,6 +439,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= 0;
         end else if ((if_id_id_inst_reg[6:0] == 7'b0100011) && (if_id_id_inst_reg[14:12] == 3'b010)) begin // sw
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b0;
             id_exe_wb_rf_waddr_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
@@ -446,6 +456,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= 0;
         end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b000)) begin // addi
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -460,6 +471,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b111)) begin // andi
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -474,6 +486,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b001)) begin // slli
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -488,6 +501,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b101)) begin // srli
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -502,6 +516,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0010011) && (if_id_id_inst_reg[14:12] == 3'b110)) begin // ori
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -516,6 +531,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b011)) begin // sltu
             id_exe_if_branch_reg <= 0; // not a branch command
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1; // write back register
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1; // we do need to restore from alu_y
@@ -530,6 +546,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // some magic reg by plf
         end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b111)) begin // and
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -544,6 +561,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b000)) begin // add
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -558,6 +576,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b110)) begin // or
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -572,6 +591,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
         end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b100)) begin // xor
             id_exe_if_branch_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
             id_exe_exe_rfstorealuy_reg <= 1'b1;
@@ -594,6 +614,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_wb_we_reg <= 0;
             id_exe_mem_load_reg <= 0;
             id_exe_mem_store_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_rf_we_reg <= 0;
             id_exe_wb_rf_waddr_reg <= 0;
             id_exe_rd_reg <= 0;
