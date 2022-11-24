@@ -13,7 +13,7 @@
 `define ALU_OP_SETB        4'd11 //for lui
 `define ALU_OP_SLTU        4'd12 // for sltu
 `define ALU_OP_CSRS        4'd13 // for csrrs
-`define SLU_OP_CSRC        4'd14 // for csrrc
+`define ALU_OP_CSRC        4'd14 // for csrrc
 
 
 
