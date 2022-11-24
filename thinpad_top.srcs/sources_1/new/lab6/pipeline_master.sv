@@ -52,10 +52,19 @@ module pipeline_master #(
     output reg  [31:0] rf_wdata,
     output reg  rf_we=0,
 
-    //TODO: 写immgen的模�??????????
+    //: 写immgen的模�??????????
     output reg [31:0] imm_gen_o,
     output reg [4:0] imm_gen_type_o,
     input wire [31:0] imm_gen_i
+
+    // csr reg file
+    output reg  [11:0]  csr_raddr_a,
+    input  wire [31:0] csr_rdata_a,
+    output reg  [11:0]  csr_raddr_b,
+    input  wire [31:0] csr_rdata_b,
+    output reg  [11:0]  csr_waddr,
+    output reg  [31:0] csr_wdata,
+    output reg  csr_we=0,
 );
 
 // state_if 生成的信�??????????
@@ -221,7 +230,57 @@ always_ff @ (posedge clk_i) begin
         id_exe_wb_rf_we_reg <= 0;
         id_exe_rd_reg <= 0;
     end else begin
-        if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
+        // instruction analysis here begin 
+        // csr instructions
+        if(if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b001) begin // csrrw
+            id_exe_if_branch_reg <= 0;
+
+            id_exe_wb_rf_we_reg <= 1'b1; // write reg back
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // rd register in instruction
+            id_exe_exe_rfstorealuy_reg <= 1'b0; // donot restore from alu
+
+            // close wishbone signal in wb stage
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+
+            // TODO change combine logic here
+            // and we also need to change the value of crs register
+
+            // we donot care alu here
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // rd reg again
+        end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b010) begin // csrrs
+            // csrrs, set corresponding position as 1
+            id_exe_if_branch_reg <= 0;
+
+            id_exe_wb_rf_we_reg <= 1'b1; // write reg back
+            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // rd register in instruction
+            id_exe_exe_rfstorealuy_reg <= 1'b1;
+
+            // close wishbone signal in wb stage
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+
+            // TODO change combine logic here
+            // and we also need to change the value of crs register
+
+            // alu stage, we implement here as origin csr value add 0
+            id_exe_exe_alu_a_reg <= csr_rdata_a;
+            id_exe_exe_alu_b_reg <= 32'b0; // the other is 0
+            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // rd reg again
+
+
+        end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b011) begin // csrrc
+            // csrrc set the corresponding position 0
+
+
+        end else if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b1;
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7];
@@ -540,11 +599,19 @@ always_ff @ (posedge clk_i) begin
     end
 end
 
+// state_id comb
 always_comb begin
-    rf_raddr_a = if_id_id_inst_reg[19:15];
-    rf_raddr_b = if_id_id_inst_reg[24:20];
+    // we add the crs addr here
+    
+    csr_raddr_a = if_id_id_inst_reg[31 : 20]; // we only use one csr read function here
+
+    rf_raddr_a = if_id_id_inst_reg[19:15]; // rs1
+    rf_raddr_b = if_id_id_inst_reg[24:20]; // rs2
     imm_gen_o = if_id_id_inst_reg;
-    if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
+
+    if (if_id_id_inst_reg[6:0] == 7'b1110011) begin // csrrw, csrrs, csrrc
+        
+    end else if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
         imm_gen_type_o = `TYPE_U;
         have_rs1 = 0;
         have_rs2 = 0;

@@ -13,9 +13,12 @@
 `define ALU_OP_SETB        4'd11 //for lui
 `define ALU_OP_SLTU        4'd12 // for sltu
 
-`define TYPE_R 5'd12
-`define TYPE_I 5'd13
-`define TYPE_S 5'd14
-`define TYPE_B 5'd15
-`define TYPE_U 5'd16
-`define TYPE_J 5'd17
+
+
+`define TYPE_R 5'd16
+`define TYPE_I 5'd17
+`define TYPE_S 5'd18
+`define TYPE_B 5'd19
+`define TYPE_U 5'd20
+`define TYPE_J 5'd21
+`define TYPE_CSR 5'd22

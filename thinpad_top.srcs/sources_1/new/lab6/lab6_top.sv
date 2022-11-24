@@ -214,8 +214,6 @@ module lab6_top (
       .clk_i(sys_clk),
       .rst_i(sys_rst),
 
-      // TODO: 添加需要的控制信号，例如按键开关？
-
       // wishbone master
       .if_wb_cyc_o(if_wbm_cyc_o),
       .if_wb_stb_o(if_wbm_stb_o),
@@ -258,6 +256,15 @@ module lab6_top (
     .rf_waddr(rf_waddr),
     .rf_wdata(rf_wdata),
     .rf_we(rf_we)
+
+    // csrfile
+    .csr_raddr_a(csr_raddr_a),
+    .csr_rdata_a(csr_rdata_a),
+    .csr_raddr_b(csr_raddr_b),
+    .csr_rdata_b(csr_rdata_b),
+    .csr_waddr(csr_waddr),
+    .csr_wdata(csr_wdata),
+    .csr_we(csr_we)
   );
 
 

@@ -13,7 +13,7 @@ module imm_gen(
 
 always_comb begin
     imm_gen_o = 0;
-    casez(imm_gen_type_i)
+    case(imm_gen_type_i)
     `TYPE_I: begin
         imm_gen_o = {{20{imm_gen_i[31]}},imm_gen_i[31:20]};
     end
@@ -28,6 +28,11 @@ always_comb begin
     end
     `TYPE_J: begin
         imm_gen_o[31:1] = {{11{imm_gen_i[31]}},imm_gen_i[31],imm_gen_i[19:12], imm_gen_i[20], imm_gen_i[30:21]};
+    end
+
+    `TYPE_CSR : begin
+        // csr instruction has only 5 bits
+        imm_gen_o[4:0] = imm_gen_i[19:15]; // imm_gen_ 19:16 stands for uimm (rs1)
     end
 
     default: imm_gen_o = 0;
