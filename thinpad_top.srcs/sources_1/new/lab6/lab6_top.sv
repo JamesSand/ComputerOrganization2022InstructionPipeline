@@ -158,6 +158,10 @@ module lab6_top (
   logic [31:0] rf_rdata_b, rf_rdata_a, rf_wdata; 
   logic rf_we;
 
+  logic [11:0] csr_raddr_a, csr_raddr_b, csr_waddr;
+  logic [31:0] csr_rdata_b, csr_rdata_a, csr_wdata; 
+  logic csr_we;
+
   wb_arbiter_2 #(
     .DATA_WIDTH(32),
     .ADDR_WIDTH(32),
@@ -290,6 +294,18 @@ module lab6_top (
 .raddr_b(rf_raddr_b),
 .rdata_b(rf_rdata_b)
 );
+
+  csrfile u_csr(
+    .clk(sys_clk),
+    .reset(sys_rst),
+    .waddr(csr_waddr),
+    .wdata(csr_wdata),
+    .we(csr_we),
+    .raddr_a(csr_raddr_a),
+    .rdata_a(csr_rdata_a),
+    .raddr_b(csr_raddr_b),
+    .rdata_b(csr_rdata_b)
+  );
   /* =========== Lab5 Master end =========== */
 
   /* =========== Lab5 MUX begin =========== */
