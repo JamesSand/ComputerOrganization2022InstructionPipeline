@@ -55,7 +55,7 @@ module pipeline_master #(
     //: 写immgen的模�??????????
     output reg [31:0] imm_gen_o,
     output reg [4:0] imm_gen_type_o,
-    input wire [31:0] imm_gen_i
+    input wire [31:0] imm_gen_i,
 
     // csr reg file
     output reg  [11:0]  csr_raddr_a,
@@ -64,7 +64,7 @@ module pipeline_master #(
     input  wire [31:0] csr_rdata_b,
     output reg  [11:0]  csr_waddr,
     output reg  [31:0] csr_wdata,
-    output reg  csr_we=0,
+    output reg  csr_we=0
 );
 
 // state_if 生成的信�??????????
@@ -100,6 +100,12 @@ reg id_exe_exe_rfstorealuy_reg; // 在wb阶段寄存器是否存alu计算结果
 
 reg [4:0] id_exe_rd_reg;
 
+// for csr
+reg id_exe_wb_csr_we_reg;
+reg [11:0]   id_exe_wb_csr_waddr_reg;
+reg [31:0]  id_exe_wb_csr_wdata_reg; 
+reg id_exe_exe_csrstorealuy_reg;
+
 
 // state_exe 生成的信�??????????
 reg exe_stall_i,exe_stall_o,exe_flush_i,exe_flush_o;
@@ -119,6 +125,11 @@ reg exe_mem_wb_rf_we_reg;
 
 reg [4:0] exe_mem_rd_reg;
 
+// for csr
+reg [31:0] exe_mem_wb_csr_wdata_reg;
+reg [4:0] exe_mem_wb_csr_waddr_reg;
+reg exe_mem_wb_csr_we_reg;
+
 //mem
 reg mem_stall_i,mem_stall_o,mem_flush_i,mem_flush_o;
 reg [31:0] mem_wb_wb_rf_wdata_start_reg;
@@ -130,6 +141,11 @@ reg mem_wb_wb_rf_we_ack_reg;
 
 reg [4:0] mem_wb_rd_ack_reg;
 reg [4:0] mem_wb_rd_start_reg;
+
+// for csr
+reg [31:0] mem_wb_wb_csr_wdata_reg;
+reg [4:0] mem_wb_wb_csr_waddr_reg;
+reg mem_wb_wb_csr_we_reg;
 
 
 //信号和always执行逻辑的分割线
@@ -229,15 +245,19 @@ always_ff @ (posedge clk_i) begin
         id_exe_mem_store_reg <= 0;
         id_exe_wb_rf_we_reg <= 0;
         id_exe_rd_reg <= 0;
+        // csr
+        id_exe_wb_csr_we_reg <= 0;
     end else begin
         // instruction analysis here begin 
         // csr instructions
         if(if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b001) begin // csrrw
             id_exe_if_branch_reg <= 0;
 
+            // write rd
             id_exe_wb_rf_we_reg <= 1'b1; // write reg back
             id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // rd register in instruction
             id_exe_exe_rfstorealuy_reg <= 1'b0; // donot restore from alu
+            id_exe_wb_rf_wdata_reg <= csr_rdata_a;
 
             // close wishbone signal in wb stage
             id_exe_mem_wb_cyc_reg <= 1'b0;
@@ -246,36 +266,18 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_store_reg <= 1'b0;
             id_exe_mem_load_reg <= 0;
 
-            // TODO change combine logic here
-            // and we also need to change the value of crs register
+            // TODO: set csr we reg = in other cases
+            // write csr
+            id_exe_wb_csr_we_reg <= 1'b1;
+            id_exe_wb_csr_wdata_reg <= rf_rdata_a;
+            id_exe_wb_csr_waddr_reg <= if_id_id_inst_reg[31:20];
 
             // we donot care alu here
             id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // rd reg again
+
         end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b010) begin // csrrs
             // csrrs, set corresponding position as 1
-            id_exe_if_branch_reg <= 0;
-
-            id_exe_wb_rf_we_reg <= 1'b1; // write reg back
-            id_exe_wb_rf_waddr_reg <= if_id_id_inst_reg[11:7]; // rd register in instruction
-            id_exe_exe_rfstorealuy_reg <= 1'b1;
-
-            // close wishbone signal in wb stage
-            id_exe_mem_wb_cyc_reg <= 1'b0;
-            id_exe_mem_wb_stb_reg <= 1'b0;
-            id_exe_mem_wb_we_reg <= 1'b0;
-            id_exe_mem_store_reg <= 1'b0;
-            id_exe_mem_load_reg <= 0;
-
-            // TODO change combine logic here
-            // and we also need to change the value of crs register
-
-            // alu stage, we implement here as origin csr value add 0
-            id_exe_exe_alu_a_reg <= csr_rdata_a;
-            id_exe_exe_alu_b_reg <= 32'b0; // the other is 0
-            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
-            id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // rd reg again
-
-
+            
         end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b011) begin // csrrc
             // csrrc set the corresponding position 0
 
@@ -602,7 +604,7 @@ end
 // state_id comb
 always_comb begin
     // we add the crs addr here
-    
+    // TODO: if rd is x0, we should not do the read operation
     csr_raddr_a = if_id_id_inst_reg[31 : 20]; // we only use one csr read function here
 
     rf_raddr_a = if_id_id_inst_reg[19:15]; // rs1
@@ -658,7 +660,9 @@ always_comb begin
     (exe_mem_rd_reg == if_id_id_inst_reg[19:15] && if_id_id_inst_reg[19:15] != 0 && have_rs1)||
     (exe_mem_rd_reg == if_id_id_inst_reg[24:20] && if_id_id_inst_reg[24:20] != 0 && have_rs2)||
     (mem_wb_rd_ack_reg == if_id_id_inst_reg[19:15] && if_id_id_inst_reg[19:15] != 0 && have_rs1)||
-    (mem_wb_rd_ack_reg == if_id_id_inst_reg[24:20] && if_id_id_inst_reg[24:20] != 0 && have_rs2)
+    (mem_wb_rd_ack_reg == if_id_id_inst_reg[24:20] && if_id_id_inst_reg[24:20] != 0 && have_rs2)||
+    (rf_we&&rf_waddr == if_id_id_inst_reg[19:15] && if_id_id_inst_reg[19:15] != 0 && have_rs1)||
+    (rf_we&&rf_waddr == if_id_id_inst_reg[24:20] && if_id_id_inst_reg[24:20] != 0 && have_rs2)
     ) begin
         id_stall_o = 1;
     end
@@ -685,6 +689,7 @@ always_ff @ (posedge clk_i) begin
         exe_mem_mem_load_reg <= 0;
         exe_mem_mem_store_reg <= 0;
         exe_mem_wb_rf_we_reg <= 0;
+        exe_mem_wb_csr_we_reg <= 0;
         exe_mem_rd_reg <= 0;
         exe_if_if_branch_successornot_reg  <= 0;
         exe_if_if_branch_compcompute <= 0;
@@ -709,12 +714,25 @@ always_ff @ (posedge clk_i) begin
         end
         exe_mem_wb_rf_we_reg <= id_exe_wb_rf_we_reg;
         exe_mem_wb_rf_waddr_reg <= id_exe_wb_rf_waddr_reg;
+
+        // for csr
+        exe_mem_wb_csr_we_reg <= id_exe_wb_csr_we_reg;
+        exe_mem_wb_csr_waddr_reg <= id_exe_wb_csr_waddr_reg;
+
         exe_mem_rd_reg <= id_exe_rd_reg; // pass it to next stage
         if (id_exe_exe_rfstorealuy_reg) begin   // 要将alu计算结果放进寄存器堆的情�??????????
             exe_mem_wb_rf_wdata_reg <= alu_y;
         end else begin
             exe_mem_wb_rf_wdata_reg <= id_exe_wb_rf_wdata_reg;
         end
+
+        // csr special
+        if (id_exe_exe_csrstorealuy_reg) begin   // choose if store to csr from alu_y
+            exe_mem_wb_csr_wdata_reg <= alu_y;
+        end else begin
+            exe_mem_wb_csr_wdata_reg <= id_exe_wb_csr_wdata_reg;
+        end
+
         exe_mem_mem_load_reg <= id_exe_mem_load_reg;
         exe_mem_mem_store_reg <= id_exe_mem_store_reg;
         exe_mem_mem_wb_cyc_reg <= id_exe_mem_wb_cyc_reg;
@@ -746,7 +764,7 @@ always_comb begin
 end
 
 
-//men
+//mem
 always_ff @ (posedge clk_i) begin
     if (rst_i) begin
         mem_wb_wb_rf_we_ack_reg <= 0;
@@ -757,6 +775,7 @@ always_ff @ (posedge clk_i) begin
     end else if (mem_stall_i) begin
     end else if (mem_flush_i) begin
         mem_wb_wb_rf_we_ack_reg <= 0;
+        mem_wb_wb_csr_we_reg <= 0;
         mem_wb_rd_ack_reg <= 0;
     end else begin
         if (exe_mem_mem_load_reg == 0 && exe_mem_mem_store_reg == 0 && mem_wb_stb_o == 0)begin
@@ -767,6 +786,13 @@ always_ff @ (posedge clk_i) begin
             // mem_wb_cyc_o <= 0;
             // mem_wb_stb_o <= 0;
             // mem_wb_we_o <= 0;
+
+            // for csr
+            mem_wb_wb_csr_waddr_reg <= exe_mem_wb_csr_waddr_reg;
+            mem_wb_wb_csr_wdata_reg <= exe_mem_wb_csr_wdata_reg;
+            mem_wb_wb_csr_we_reg <= exe_mem_wb_csr_we_reg;
+            
+            // TODO deal with data conflict
         end
         else begin
             if (mem_wb_ack_i) begin
@@ -813,6 +839,11 @@ end
 always_ff @ (posedge clk_i) begin
   end
 always_comb begin
+
+    csr_we = mem_wb_wb_csr_we_reg;
+    csr_waddr = mem_wb_wb_csr_waddr_reg;
+    csr_wdata = mem_wb_wb_csr_wdata_reg;
+
     rf_we = mem_wb_wb_rf_we_ack_reg;
     rf_waddr = mem_wb_wb_rf_waddr_ack_reg;
     rf_wdata = mem_wb_wb_rf_wdata_ack_reg;

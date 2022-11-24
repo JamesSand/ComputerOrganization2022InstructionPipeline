@@ -255,7 +255,7 @@ module lab6_top (
     .rf_rdata_b(rf_rdata_b),
     .rf_waddr(rf_waddr),
     .rf_wdata(rf_wdata),
-    .rf_we(rf_we)
+    .rf_we(rf_we),
 
     // csrfile
     .csr_raddr_a(csr_raddr_a),
