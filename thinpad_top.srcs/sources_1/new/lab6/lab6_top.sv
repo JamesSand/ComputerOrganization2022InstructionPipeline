@@ -295,7 +295,7 @@ module lab6_top (
 .rdata_b(rf_rdata_b)
 );
 
-  csrfile u_csr(
+  csrfile32 u_csr(
     .clk(sys_clk),
     .reset(sys_rst),
     .waddr(csr_waddr),
