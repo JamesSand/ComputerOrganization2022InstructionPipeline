@@ -247,8 +247,6 @@ always_ff @ (posedge clk_i) begin
         id_exe_wb_csr_we_reg <= 0;
         id_exe_wb_rf_we_reg <= 0;
         id_exe_rd_reg <= 0;
-        // csr
-        id_exe_wb_csr_we_reg <= 0;
     end else begin
         // instruction analysis here begin 
         // csr instructions
