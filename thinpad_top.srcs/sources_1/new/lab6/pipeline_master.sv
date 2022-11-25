@@ -11,7 +11,7 @@ module pipeline_master #(
     input wire rst_i,
 
  
-    //if wishbone master内存�??????????
+    //if wishbone master内存�???????????
     output reg if_wb_cyc_o=0,
     output reg if_wb_stb_o=0,
     input wire if_wb_ack_i,
@@ -21,7 +21,7 @@ module pipeline_master #(
     output reg [DATA_WIDTH/8-1:0] if_wb_sel_o,
     output reg if_wb_we_o=0,
 
-    //mem wishbone master内存�??????????
+    //mem wishbone master内存�???????????
     output reg mem_wb_cyc_o=0,
     output reg mem_wb_stb_o=0,
     input wire mem_wb_ack_i,
@@ -31,13 +31,13 @@ module pipeline_master #(
     output reg [DATA_WIDTH/8-1:0] mem_wb_sel_o,
     output reg mem_wb_we_o=0,
 
-    // 连接 ALU 模块的信�??????????
+    // 连接 ALU 模块的信�???????????
     output reg  [31:0] alu_a,
     output reg  [31:0] alu_b,
     output reg  [ 3:0] alu_op,
     input  wire [31:0] alu_y,
 
-    //if 阶段 PC+4 连接 ALU 模块的信�??????????
+    //if 阶段 PC+4 连接 ALU 模块的信�???????????
     output reg  [31:0] if_alu_a,
     output reg  [31:0] if_alu_b,
     output reg  [ 3:0] if_alu_op,
@@ -52,7 +52,7 @@ module pipeline_master #(
     output reg  [31:0] rf_wdata,
     output reg  rf_we=0,
 
-    //: 写immgen的模�??????????
+    //: 写immgen的模�???????????
     output reg [31:0] imm_gen_o,
     output reg [4:0] imm_gen_type_o,
     input wire [31:0] imm_gen_i,
@@ -67,16 +67,19 @@ module pipeline_master #(
     output reg  csr_we=0,
     output reg  [11:0]  csr_waddr_exp,
     output reg  [31:0] csr_wdata_exp,
-    output reg  csr_we_exp=0
+    output reg  csr_we_exp=0,
+
+    // mtime
+    input  wire mtime_exceed_i
 );
 
-// state_if 生成的信�??????????
+// state_if 生成的信�???????????
 reg if_stall_i,if_stall_o,if_flush_i,if_flush_o;
 reg [31:0]  if_id_id_pc_now_reg;
 reg [31:0]  if_pc_reg;
 reg [31:0]  if_id_id_inst_reg;
 
-// state_id 生成的信�??????????
+// state_id 生成的信�???????????
 reg id_stall_i,id_stall_o,id_flush_i,id_flush_o;
 reg [31:0]  id_exe_if_branch_addr_reg;
 reg id_exe_if_branch_reg;
@@ -114,7 +117,7 @@ reg [31:0] id_exe_exe_exception_pc_reg;
 reg [31:0] id_exe_exe_exception_mcause_reg;
 
 
-// state_exe 生成的信�??????????
+// state_exe 生成的信�???????????
 reg exe_stall_i,exe_stall_o,exe_flush_i,exe_flush_o;
 reg [31:0]  exe_if_if_branch_addr_reg;
 reg exe_if_if_branch_successornot_reg,exe_if_if_branch_compcompute;
@@ -189,7 +192,7 @@ always_ff @ (posedge clk_i) begin
         //if_wb_cyc_o <= 1'b0;
     end else begin
         if_id_id_pc_now_reg <= if_pc_reg;
-        if (if_wb_ack_i) begin//多周期读写
+        if (if_wb_ack_i) begin//多周期读�?
             if_id_id_inst_reg <= if_wb_dat_i;
             if_pc_reg <= if_alu_y;//branch
             if_wb_stb_o <= 1'b0;
@@ -906,7 +909,7 @@ always_ff @ (posedge clk_i) begin
         exe_mem_wb_csr_waddr_reg <= id_exe_wb_csr_waddr_reg;
 
         exe_mem_rd_reg <= id_exe_rd_reg; // pass it to next stage
-        if (id_exe_exe_rfstorealuy_reg) begin   // 要将alu计算结果放进寄存器堆的情�??????????
+        if (id_exe_exe_rfstorealuy_reg) begin   // 要将alu计算结果放进寄存器堆的情�???????????
             exe_mem_wb_rf_wdata_reg <= alu_y;
         end else begin
             exe_mem_wb_rf_wdata_reg <= id_exe_wb_rf_wdata_reg;
