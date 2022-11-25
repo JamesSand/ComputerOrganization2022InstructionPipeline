@@ -32,7 +32,7 @@ always_comb begin
     if (if_wb_ack_i) begin
         if_flush_i = 0;
         if_stall_i = 0;
-    end else if (if_stall_o) begin
+    end else if (if_stall_o || exe_flush_o) begin
         if_stall_i = 0;
         if_flush_i = 1;
     end else if (mem_stall_o || id_stall_o) begin
@@ -52,7 +52,7 @@ always_comb begin
     if (mem_stall_o) begin
         id_stall_i = 1;
         id_flush_i = 0;
-    end else if (id_stall_o) begin
+    end else if (id_stall_o || exe_flush_o) begin
         id_stall_i = 0;
         id_flush_i = 1;
     end else begin
@@ -66,6 +66,9 @@ always_comb begin
     if (mem_stall_o) begin
         exe_stall_i = 1;
         exe_flush_i = 0;
+    end else if (exe_flush_o) begin
+        exe_stall_i = 0;
+        exe_flush_i = 1;
     end else begin
         exe_stall_i = 0;
         exe_flush_i = 0;
