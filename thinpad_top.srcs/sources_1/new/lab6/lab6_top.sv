@@ -158,9 +158,9 @@ module lab6_top (
   logic [31:0] rf_rdata_b, rf_rdata_a, rf_wdata; 
   logic rf_we;
 
-  logic [11:0] csr_raddr_a, csr_raddr_b, csr_waddr;
-  logic [31:0] csr_rdata_b, csr_rdata_a, csr_wdata; 
-  logic csr_we;
+  logic [11:0] csr_raddr_a, csr_raddr_b, csr_waddr, csr_waddr_exp;
+  logic [31:0] csr_rdata_b, csr_rdata_a, csr_wdata, csr_wdata_exp; 
+  logic csr_we, csr_we_exp;
 
   wb_arbiter_2 #(
     .DATA_WIDTH(32),
@@ -264,7 +264,10 @@ module lab6_top (
     .csr_rdata_b(csr_rdata_b),
     .csr_waddr(csr_waddr),
     .csr_wdata(csr_wdata),
-    .csr_we(csr_we)
+    .csr_we(csr_we),
+    .csr_waddr_exp(csr_waddr_exp),
+    .csr_wdata_exp(csr_wdata_exp),
+    .csr_we_exp(csr_we_exp)
   );
 
 
@@ -308,6 +311,9 @@ module lab6_top (
     .waddr(csr_waddr),
     .wdata(csr_wdata),
     .we(csr_we),
+    .waddr_exp(csr_waddr_exp),
+    .wdata_exp(csr_wdata_exp),
+    .we_exp(csr_we_exp),
     .raddr_a(csr_raddr_a),
     .rdata_a(csr_rdata_a),
     .raddr_b(csr_raddr_b),

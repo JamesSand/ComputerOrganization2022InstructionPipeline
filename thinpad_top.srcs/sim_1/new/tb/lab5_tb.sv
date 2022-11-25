@@ -39,7 +39,7 @@ module lab5_tb;
 
   // Windows 需要注意路径分隔符的转义，例如 "D:\\foo\\bar.bin"
   // parameter BASE_RAM_INIT_FILE = "D:\\2022SecondHalf\\2022Fall\\ComputerOriganization\\rv-2022\\supervisor-rv\\kernel\\kernel.bin"; // BaseRAM 初始化文件，请修改为实际的绝对路径
-  parameter BASE_RAM_INIT_FILE = "D:\\2022SecondHalf\\2022Fall\\ComputerOriganization\\rv-2022\\asmcode\\testcase1.bin"; // BaseRAM 初始化文件，请修改为实际的绝对路径
+  parameter BASE_RAM_INIT_FILE = "E:\\rv-2022\\asmcode\\lab6.bin"; // BaseRAM 初始化文件，请修改为实际的绝对路径
   parameter EXT_RAM_INIT_FILE = "";  // ExtRAM 初始化文件，请修改为实际的绝对路径
 
   initial begin

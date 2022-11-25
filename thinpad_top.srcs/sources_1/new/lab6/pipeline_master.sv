@@ -64,7 +64,10 @@ module pipeline_master #(
     input  wire [31:0] csr_rdata_b,
     output reg  [11:0]  csr_waddr,
     output reg  [31:0] csr_wdata,
-    output reg  csr_we=0
+    output reg  csr_we=0,
+    output reg  [11:0]  csr_waddr_exp,
+    output reg  [31:0] csr_wdata_exp,
+    output reg  csr_we_exp=0
 );
 
 // state_if 生成的信�??????????
@@ -290,7 +293,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_load_reg <= 0;
             id_exe_exe_rfstorealuy_reg <= 1'b0;
             id_exe_rd_reg <= 0;
-            id_exe_wb_csr_we_reg <= 1'b1;
+            id_exe_wb_csr_we_reg <= 1'b0;
             id_exe_wb_csr_waddr_reg <= 0;
 
             id_exe_exe_exception_pc_reg <= if_id_id_pc_now_reg;
@@ -951,6 +954,46 @@ always_comb begin
     end
 end
 
+typedef enum logic [3:0] {
+    STATE_INIT = 0,
+    STATE_W_mepc=1,
+    STATE_W_mcause=2,
+    STATE_W_mstatus=3
+} state_exp;
+
+always_ff @ (posedge clk_i ) begin
+    if(rst_i) begin
+        state_exp <= STATE_INIT;
+        csr_we_exp <= 0;
+    end else if (exe_exceptionprocessup_reg) begin
+        case(state_exp)
+        STATE_INIT: begin
+            if (if_wb_stb_o==0 && mem_wb_stb_o==0) begin
+                state_exp <= STATE_W_mepc;
+                csr_we_exp <= 1;
+                csr_waddr_exp <= 12'h341;
+                csr_wdata_exp <= id_exe_exe_exception_pc_reg;
+            end
+        end
+        STATE_W_mepc: begin
+            state_exp <= STATE_W_mcause;
+            csr_we_exp <= 1;
+            csr_waddr_exp <= 12'h342;
+            csr_wdata_exp <= id_exe_exe_exception_mcause_reg;
+        end
+        STATE_W_mcause: begin
+            state_exp <= STATE_W_mstatus;
+            csr_we_exp <= 1;
+            csr_waddr_exp <= 12'h300;
+            csr_wdata_exp <= {19'b0,mode_reg,11'b0};
+        end
+        STATE_W_mstatus: begin
+            state_exp <= STATE_INIT;
+            csr_we_exp <= 0;//没写完
+        end
+        endcase
+    end
+end
 
 //mem
 always_ff @ (posedge clk_i) begin
