@@ -13,7 +13,8 @@ input wire[11:0] raddr_b,
 output reg[31:0] rdata_b,
 
 input wire mtime_exceed_i,
-output reg time_interupt
+output reg time_interupt,
+output reg[15:0] leds
 );
 
 reg [31:0] mtvec;//0x305
@@ -74,7 +75,10 @@ always_comb begin
     end else begin
         time_interupt = 0;
     end
-
+    leds=0;
+    leds[0]=mip[7];
+    leds[1]=mie[7];
+    leds[15]=time_interupt;
 end
 
 always_comb begin

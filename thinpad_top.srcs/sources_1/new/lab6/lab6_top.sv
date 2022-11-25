@@ -213,7 +213,7 @@ module lab6_top (
       .ADDR_WIDTH(32),
       .DATA_WIDTH(32)
   ) u_lab6_master (
-      .leds(leds),
+      //.leds(leds),
       .clk_i(sys_clk),
       .rst_i(sys_rst),
 
@@ -312,6 +312,7 @@ module lab6_top (
 );
 
   csrfile32 u_csr(
+    .leds(leds),
     .clk(sys_clk),
     .reset(sys_rst),
     .waddr(csr_waddr),
