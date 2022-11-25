@@ -994,8 +994,8 @@ end
 always_comb begin
     leds=0;
     leds[15]=time_interupt;
-    leds[0]=mode[0];
-    leds[1]=mode[1];
+    leds[0]=mode_reg[0];
+    leds[1]=mode_reg[1];
     alu_a = id_exe_exe_alu_a_reg;
     alu_b = id_exe_exe_alu_b_reg;
     alu_op = id_exe_exe_alu_op_reg;
