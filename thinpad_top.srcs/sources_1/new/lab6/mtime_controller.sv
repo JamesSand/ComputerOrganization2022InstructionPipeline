@@ -1,6 +1,6 @@
 module mtime_controller #(
     parameter ADDR_WIDTH = 32,
-    parameter DATA_WIDTH = 32,
+    parameter DATA_WIDTH = 32
 ) (
     // clk and reset
     input wire clk_i,
@@ -17,13 +17,11 @@ module mtime_controller #(
     input wire wb_we_i,
 
     // mtime exceeded signal
-    output reg mtime_exceed_o;
+    output reg mtime_exceed_o
 );
 
     reg [63:0] mtime_reg;
     reg [63:0] mtime_cmp_reg;
-    integer timer_reg;
-    integer time_limit_reg;
 
     typedef enum logic {
         STATE_IDLE = 0,
@@ -36,8 +34,6 @@ module mtime_controller #(
             state <= STATE_IDLE;
             mtime_reg <= 0;
             mtime_cmp_reg <= 0;
-            timer_reg <= 0;
-            time_limit_reg <= 10;   // change here!
             wb_ack_o <= 0;
             wb_dat_o <= 0;
             mtime_exceed_o <= 0;
@@ -76,11 +72,8 @@ module mtime_controller #(
                     else if (mtime_cmp_reg > 0) begin
                         if (mtime_reg >= mtime_cmp_reg) begin
                             mtime_exceed_o <= 1;
-                        end else if (timer_reg >= time_limit_reg) begin
-                            mtime_reg <= mtime_reg + 64'b1;
-                            timer_reg <= 0;
                         end else begin
-                            timer_reg <= timer_reg + 1;
+                            mtime_reg <= mtime_reg + 64'b1;
                         end
                     end
                 end
