@@ -1024,14 +1024,14 @@ always_ff @ (posedge clk_i ) begin
                 state_exp <= STATE_W_mepc;
                 csr_we_exp <= 1;
                 csr_waddr_exp <= 12'h341;
-                csr_wdata_exp <= id_exe_exe_exception_pc_reg;
+                csr_wdata_exp <= exe_exception_pc_reg;
             end
         end
         STATE_W_mepc: begin
             state_exp <= STATE_W_mcause;
             csr_we_exp <= 1;
             csr_waddr_exp <= 12'h342;
-            csr_wdata_exp <= id_exe_exe_exception_mcause_reg;
+            csr_wdata_exp <= exe_exception_mcause_reg;
         end
         STATE_W_mcause: begin
             state_exp <= STATE_W_mstatus;
