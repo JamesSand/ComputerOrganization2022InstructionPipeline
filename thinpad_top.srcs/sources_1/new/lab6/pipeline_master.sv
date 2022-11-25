@@ -334,7 +334,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_wb_csr_wdata_reg <= {19'b0,2'b00,11'b0};
             id_exe_exe_exceptionoccur_reg <= 0;
             id_exe_exe_csrstorealuy_reg <= 0;
-            mode_reg <= csr_rdata_a[12:11];
+            //mode_reg <= csr_rdata_a[12:11];
             temp_mode_reg <= csr_rdata_a[12:11];
         end
         // csr instructions
@@ -900,7 +900,6 @@ always_ff @ (posedge clk_i) begin
         exe_mem_rd_reg <= 0;
         exe_if_if_branch_successornot_reg <= 0;
         exe_if_if_branch_compcompute <= 0;
-        mode_reg <= 2'b11;
         exe_exceptionprocessup_reg<=0;
     end else if (exe_stall_i) begin
     end else if (exe_flush_i) begin
@@ -1023,6 +1022,7 @@ always_ff @ (posedge clk_i ) begin
         state_exp <= STATE_INIT;
         csr_we_exp <= 0;
         exe_exceptionprocessdone_reg <= 0;
+        mode_reg <= 2'b11;
     end else if (exe_exceptionprocessdone_reg) begin
         exe_exceptionprocessdone_reg <= 0;
     end else if (exe_exceptionprocessup_reg) begin
@@ -1054,6 +1054,8 @@ always_ff @ (posedge clk_i ) begin
             exe_exceptionprocessdone_reg <= 1;
         end
         endcase
+    end else if(id_exe_if_branch_reg && id_exe_wb_csr_we_reg)begin//mret
+        mode_reg <= temp_mode_reg;
     end
 end
 
