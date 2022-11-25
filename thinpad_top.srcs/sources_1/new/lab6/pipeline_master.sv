@@ -707,7 +707,7 @@ always_comb begin
     imm_gen_o = if_id_id_inst_reg;
 
     if (if_id_id_inst_reg[6:0] == 7'b1110011) begin // csrrw, csrrs, csrrc
-        imm_gen_type_o = 'TYPE_CSR;
+        imm_gen_type_o = `TYPE_CSR;
         have_rs1 = 1;
         have_rs2 = 0;
     end else if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
