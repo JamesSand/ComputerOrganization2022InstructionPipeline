@@ -140,6 +140,7 @@ reg [11:0] exe_mem_wb_csr_waddr_reg;
 reg exe_mem_wb_csr_we_reg;
 
 reg [2:0] mode_reg;//00U,11M
+reg [2:0] temp_mode_reg;
 reg exe_exceptionprocessup_reg;
 reg [31:0] exe_exception_pc_reg;
 reg [31:0] exe_exception_mcause_reg;
@@ -334,6 +335,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_exe_exceptionoccur_reg <= 0;
             id_exe_exe_csrstorealuy_reg <= 0;
             mode_reg <= csr_rdata_a[12:11];
+            temp_mode_reg <= csr_rdata_a[12:11];
         end
         // csr instructions
         else if(if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b001) begin // csrrw
@@ -996,6 +998,8 @@ always_comb begin
     leds[15]=time_interupt;
     leds[0]=mode_reg[0];
     leds[1]=mode_reg[1];
+    leds[2]=temp_mode_reg[0];
+    leds[3]=temp_mode_reg[1];
     alu_a = id_exe_exe_alu_a_reg;
     alu_b = id_exe_exe_alu_b_reg;
     alu_op = id_exe_exe_alu_op_reg;
