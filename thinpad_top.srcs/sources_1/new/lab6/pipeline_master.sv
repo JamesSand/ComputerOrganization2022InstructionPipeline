@@ -1049,7 +1049,7 @@ always_ff @ (posedge clk_i ) begin
         end
         STATE_W_mstatus: begin
             state_exp <= STATE_INIT;
-            csr_we_exp <= 0;//没写完
+            csr_we_exp <= 0;
             mode_reg <= 2'b11;
             exe_exceptionprocessdone_reg <= 1;
         end
