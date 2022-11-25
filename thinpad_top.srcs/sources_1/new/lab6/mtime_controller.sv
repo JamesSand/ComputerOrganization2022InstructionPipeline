@@ -73,6 +73,7 @@ module mtime_controller #(
                         if (mtime_reg >= mtime_cmp_reg) begin
                             mtime_exceed_o <= 1;
                         end else begin
+                            mtime_exceed_o <= 0;
                             mtime_reg <= mtime_reg + 64'b1;
                         end
                     end

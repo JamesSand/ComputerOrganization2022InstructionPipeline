@@ -714,7 +714,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_mem_load_reg <= 1'b0;
             id_exe_exe_alu_a_reg <= rf_rdata_a; // rs1
             id_exe_exe_alu_b_reg <= rf_rdata_b; // rs2
-            id_exe_exe_alu_op_reg <= `ALU_OP_AND;
+            id_exe_exe_alu_op_reg <= `ALU_OP_SLTU;
             id_exe_rd_reg <= if_id_id_inst_reg[11:7]; // some magic reg by plf
             id_exe_exe_exceptionoccur_reg<=0;
         end else if ((if_id_id_inst_reg[6:0] == 7'b0110011) && (if_id_id_inst_reg[14:12] == 3'b111)) begin // and
