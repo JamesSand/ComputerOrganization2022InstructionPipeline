@@ -69,8 +69,7 @@ module pipeline_master #(
     output reg  [31:0] csr_wdata_exp,
     output reg  csr_we_exp=0,
 
-    // mtime
-    input  wire mtime_exceed_i
+    input wire time_interupt
 );
 
 // state_if 生成的信�???????????
@@ -144,6 +143,7 @@ reg [2:0] mode_reg;//00U,11M
 reg exe_exceptionprocessup_reg;
 reg [31:0] exe_exception_pc_reg;
 reg [31:0] exe_exception_mcause_reg;
+reg exe_exceptionprocessdone_reg;
 
 //mem
 reg mem_stall_i,mem_stall_o,mem_flush_i,mem_flush_o;
@@ -190,6 +190,9 @@ always_ff @ (posedge clk_i) begin
         if_id_id_inst_reg <= 0;
         //if_wb_stb_o <= 1'b0;
         //if_wb_cyc_o <= 1'b0;
+        if (exe_exceptionprocessdone_reg) begin
+            if_pc_reg <= csr_rdata_b;
+        end
     end else begin
         if_id_id_pc_now_reg <= if_pc_reg;
         if (if_wb_ack_i) begin//多周期读�?
@@ -220,6 +223,11 @@ always_comb begin
     end else if (if_id_id_inst_reg[6:0] == 7'b1100111) begin // jalr
         if_alu_a = rf_rdata_a;
         if_alu_b = imm_gen_i;
+        if_alu_op = `ALU_OP_ADD;
+        if_flush_o = 1;
+    end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:28] == 4'b0011) begin   // mret
+        if_alu_a = 0;
+        if_alu_b = 0;
         if_alu_op = `ALU_OP_ADD;
         if_flush_o = 1;
     end else begin
@@ -306,6 +314,26 @@ always_ff @ (posedge clk_i) begin
                 id_exe_exe_exception_mcause_reg <= 11;//environment call from M mode
             end
             id_exe_exe_exceptionoccur_reg<=1;
+        end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:28] == 4'b0011) begin   // mret
+            id_exe_if_branch_reg <= 1;
+            id_exe_if_branch_addr_reg <= csr_rdata_b;
+            id_exe_exe_isjump_reg <= 1;
+            id_exe_id_branchequ <= 0;
+            id_exe_wb_rf_we_reg <= 1'b0;
+            id_exe_wb_rf_waddr_reg <= 0;
+            id_exe_mem_wb_cyc_reg <= 1'b0;
+            id_exe_mem_wb_stb_reg <= 1'b0;
+            id_exe_mem_wb_we_reg <= 1'b0;
+            id_exe_mem_store_reg <= 1'b0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_exe_rfstorealuy_reg <= 1'b0;
+            id_exe_rd_reg <= 0;
+            id_exe_wb_csr_we_reg <= 1'b1;
+            id_exe_wb_csr_waddr_reg <= 12'h300;
+            id_exe_wb_csr_wdata_reg <= {19'b0,2'b00,11'b0};
+            id_exe_exe_exceptionoccur_reg <= 0;
+            id_exe_exe_csrstorealuy_reg <= 0;
+            mode_reg <= csr_rdata_a[12:11];
         end
         // csr instructions
         else if(if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b001) begin // csrrw
@@ -394,7 +422,7 @@ always_ff @ (posedge clk_i) begin
             id_exe_rd_reg <= if_id_id_inst_reg[11:7];
 
             
-            id_exe_exe_exceptionoccur_reg<=0;
+            id_exe_exe_exceptionoccur_reg<=0;        
         end else if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
             id_exe_if_branch_reg <= 0;
             id_exe_wb_csr_we_reg <= 1'b0;
@@ -782,15 +810,24 @@ always_comb begin
     // we add the crs addr here
     // TODO: if rd is x0, we should not do the read operation
     csr_raddr_a = if_id_id_inst_reg[31 : 20]; // we only use one csr read function here
-
+    if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:28] == 4'b0011) begin    // mret
+        csr_raddr_b = 12'h341;
+    end else begin
+        csr_raddr_b = 12'h305;
+    end
     rf_raddr_a = if_id_id_inst_reg[19:15]; // rs1
     rf_raddr_b = if_id_id_inst_reg[24:20]; // rs2
     imm_gen_o = if_id_id_inst_reg;
 
     if (if_id_id_inst_reg[6:0] == 7'b1110011) begin // csrrw, csrrs, csrrc,ecall,ebreak
         imm_gen_type_o = `TYPE_CSR;
-        have_rs1 = 1;
-        have_rs2 = 0;
+        if (if_id_id_inst_reg[14:12] != 3'b000) begin
+            have_rs1 = 1;
+            have_rs2 = 0;
+        end else begin
+            have_rs1 = 0;
+            have_rs2 = 0;
+        end
     end else if (if_id_id_inst_reg[6:0] == 7'b0110111) begin  // lui
         imm_gen_type_o = `TYPE_U;
         have_rs1 = 0;
@@ -876,12 +913,20 @@ always_ff @ (posedge clk_i) begin
         exe_mem_rd_reg <= 0;
         exe_if_if_branch_successornot_reg  <= 0;
         exe_if_if_branch_compcompute <= 0;
+        if (exe_exceptionprocessup_reg && exe_exceptionprocessdone_reg) begin
+            exe_exceptionprocessup_reg <= 0;
+        end
     end else begin
         if (id_exe_exe_exceptionoccur_reg) begin//注意暂停流水线没写,暂停流水线没有测试
-        exe_exceptionprocessup_reg <= 1;
-        exe_exception_mcause_reg <= id_exe_exe_exception_mcause_reg;
-        exe_exception_pc_reg <= id_exe_exe_exception_pc_reg;
-    end
+            exe_exceptionprocessup_reg <= 1;
+            exe_exception_mcause_reg <= id_exe_exe_exception_mcause_reg;
+            exe_exception_pc_reg <= id_exe_exe_exception_pc_reg;
+        end else if (time_interupt && mode_reg != 2'b11) begin
+            exe_exceptionprocessup_reg <= 1;
+            exe_exception_mcause_reg[31] <= 1;
+            exe_exception_mcause_reg[30:0] <= 7;    // machine time interupt
+            exe_exception_pc_reg <= if_id_id_pc_now_reg;
+        end 
 
         if (id_exe_if_branch_reg)begin
             if (id_exe_exe_isjump_reg) begin
@@ -962,12 +1007,16 @@ typedef enum logic [3:0] {
     STATE_W_mepc=1,
     STATE_W_mcause=2,
     STATE_W_mstatus=3
-} state_exp;
+} state_e;
+state_e state_exp;
 
 always_ff @ (posedge clk_i ) begin
     if(rst_i) begin
         state_exp <= STATE_INIT;
         csr_we_exp <= 0;
+        exe_exceptionprocessdone_reg <= 0;
+    end else if (exe_exceptionprocessdone_reg) begin
+        exe_exceptionprocessdone_reg <= 0;
     end else if (exe_exceptionprocessup_reg) begin
         case(state_exp)
         STATE_INIT: begin
@@ -993,6 +1042,8 @@ always_ff @ (posedge clk_i ) begin
         STATE_W_mstatus: begin
             state_exp <= STATE_INIT;
             csr_we_exp <= 0;//没写完
+            mode_reg <= 2'b11;
+            exe_exceptionprocessdone_reg <= 1;
         end
         endcase
     end

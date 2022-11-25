@@ -163,8 +163,7 @@ module lab6_top (
   logic csr_we, csr_we_exp;
 
   logic mtime_exceed;
-
-  logic mtime_exceed;
+  logic time_interupt;
 
   wb_arbiter_2 #(
     .DATA_WIDTH(32),
@@ -271,7 +270,7 @@ module lab6_top (
     .csr_we(csr_we),
 
     // mtime
-    .mtime_exceed_i(mtime_exceed),
+    .time_interupt(time_interupt),
     .csr_waddr_exp(csr_waddr_exp),
     .csr_wdata_exp(csr_wdata_exp),
     .csr_we_exp(csr_we_exp)
@@ -324,7 +323,9 @@ module lab6_top (
     .raddr_a(csr_raddr_a),
     .rdata_a(csr_rdata_a),
     .raddr_b(csr_raddr_b),
-    .rdata_b(csr_rdata_b)
+    .rdata_b(csr_rdata_b),
+    .mtime_exceed_i(mtime_exceed),
+    .time_interupt(time_interupt)
   );
   /* =========== Lab5 Master end =========== */
 
@@ -541,6 +542,7 @@ module lab6_top (
 
       // 时钟中断信号
       .mtime_exceed_o(mtime_exceed)
+      
   );
 
   /* =========== Lab5 Slaves end =========== */
