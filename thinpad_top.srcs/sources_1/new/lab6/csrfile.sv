@@ -14,9 +14,12 @@ output reg[31:0] rdata_b,
 
 input wire mtime_exceed_i,
 output reg time_interupt,
-output reg[15:0] leds
+output reg[15:0] leds,
+
+output reg [31:0] satp_out
 );
 
+reg [31:0] satp; // 0x180
 reg [31:0] mtvec;//0x305
 reg [31:0] mscratch;//0x340
 reg [31:0] mepc;//0x341 由于是32位机器 所以最低两位一直是0
@@ -25,8 +28,13 @@ reg [31:0] mstatus;//0x300 只有12:11的MPP[1:0]有用，别的都是0
 reg [31:0] mie;//0x304 只有7的MTIE有用
 reg [31:0] mip;//0x344 只有7的MTIP有用
 
+always_comb begin
+    satp_out = satp;
+end
+
 always_ff @ (posedge clk or posedge reset) begin
     if (reset) begin
+        satp <= 0;
         mtvec <= 0;
         mscratch <= 0;
         mepc <= 0;
@@ -36,6 +44,7 @@ always_ff @ (posedge clk or posedge reset) begin
         // mip <= 0;
     end else if (we) begin
         case(waddr)
+        13'h180 : satp <= wdata;
         12'h305: mtvec <= wdata;
         12'h340: mscratch <= wdata;
         12'h341: mepc[31:2] <= wdata[31:2];
@@ -46,6 +55,7 @@ always_ff @ (posedge clk or posedge reset) begin
         endcase
     end else if (we_exp) begin
         case(waddr_exp)
+        12'h180 : satp <= wdata_exp; // maybe here donot need ?
         12'h305: mtvec <= wdata_exp;
         12'h340: mscratch <= wdata_exp;
         12'h341: mepc[31:2] <= wdata_exp[31:2];

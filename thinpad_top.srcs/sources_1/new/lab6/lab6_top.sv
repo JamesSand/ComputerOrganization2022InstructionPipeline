@@ -127,6 +127,7 @@ module lab6_top (
   logic [31:0] mmu_dat_i;
   logic [ 3:0] mmu_sel_o;
   logic        mmu_we_o;
+  logic [31:0] mmu_satp;
 
 
   logic        wbm_cyc_o;
@@ -243,7 +244,10 @@ module lab6_top (
     .mux_sel_out(wbm_sel_o),
     .mux_stb_out(wbm_stb_o),
     .mux_cyc_out(wbm_cyc_o),
-    .mux_ack_in(wbm_ack_i)
+    .mux_ack_in(wbm_ack_i),
+
+    // satp
+    .satp_in(mmu_satp)
   );
 
   pipeline_master #(
@@ -311,6 +315,8 @@ module lab6_top (
     .csr_waddr_exp(csr_waddr_exp),
     .csr_wdata_exp(csr_wdata_exp),
     .csr_we_exp(csr_we_exp)
+
+    .satp_out(mmu_satp)
   );
 
 

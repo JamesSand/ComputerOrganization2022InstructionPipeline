@@ -20,7 +20,12 @@ module mmu (
     output reg [3:0] mux_sel_out,
     output reg mux_stb_out,
     output reg mux_cyc_out,
-    input wire mux_ack_in
+    input wire mux_ack_in,
+
+    // user mode
+    
+    // satp
+    input wire [31:0] satp_in,
 );
 
 // for test
