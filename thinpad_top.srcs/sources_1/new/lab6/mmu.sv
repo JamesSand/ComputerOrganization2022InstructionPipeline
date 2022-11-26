@@ -25,7 +25,7 @@ module mmu (
     // user mode
     
     // satp
-    input wire [31:0] satp_in,
+    input wire [31:0] satp_in
 );
 
 // for test

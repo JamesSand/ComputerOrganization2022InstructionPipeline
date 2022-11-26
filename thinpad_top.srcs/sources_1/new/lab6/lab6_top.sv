@@ -314,7 +314,7 @@ module lab6_top (
     .time_interupt(time_interupt),
     .csr_waddr_exp(csr_waddr_exp),
     .csr_wdata_exp(csr_wdata_exp),
-    .csr_we_exp(csr_we_exp)
+    .csr_we_exp(csr_we_exp),
 
     .satp_out(mmu_satp)
   );
