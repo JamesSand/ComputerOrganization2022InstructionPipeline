@@ -69,9 +69,7 @@ module pipeline_master #(
     output reg  [31:0] csr_wdata_exp,
     output reg  csr_we_exp=0,
 
-    input wire time_interupt,
-
-    output reg mmu_mode_o
+    input wire time_interupt
 );
 
 // state_if 生成的信�???????????
@@ -142,10 +140,6 @@ reg [11:0] exe_mem_wb_csr_waddr_reg;
 reg exe_mem_wb_csr_we_reg;
 
 reg [2:0] mode_reg;//00U,11M
-// assgin mmu_mode = mode_reg;
-always_comb begin
-    mmu_mode_o = mode_reg;
-end
 reg [2:0] temp_mode_reg;
 reg exe_exceptionprocessup_reg;
 reg [31:0] exe_exception_pc_reg;
@@ -283,25 +277,7 @@ always_ff @ (posedge clk_i) begin
         id_exe_exe_exceptionoccur_reg<=0;
     end else begin
         // instruction analysis here begin 
-        if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:25] == 7'b0001001) begin // SFENCE.VMA
-            // copy from addi, implement as addi x0, x0, 0
-            id_exe_if_branch_reg <= 0;
-            id_exe_wb_csr_we_reg <= 1'b0;
-            id_exe_wb_csr_waddr_reg <= 0;
-            id_exe_wb_rf_we_reg <= 1'b1;
-            id_exe_wb_rf_waddr_reg <= 0;
-            id_exe_exe_rfstorealuy_reg <= 1'b1;
-            id_exe_mem_wb_cyc_reg <= 1'b0;
-            id_exe_mem_wb_stb_reg <= 1'b0;
-            id_exe_mem_wb_we_reg <= 1'b0;
-            id_exe_mem_store_reg <= 1'b0;
-            id_exe_mem_load_reg <= 0;
-            id_exe_exe_alu_a_reg <= 0;
-            id_exe_exe_alu_b_reg <= 0;
-            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
-            id_exe_rd_reg <= 0;
-            id_exe_exe_exceptionoccur_reg<=0;
-        end else if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:20] == 1) begin //ebreak
+        if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:20] == 1) begin //ebreak
             id_exe_if_branch_reg <= 0;
             id_exe_wb_rf_we_reg <= 1'b0;
             id_exe_wb_rf_waddr_reg <= 0;
@@ -1016,7 +992,6 @@ always_ff @ (posedge clk_i) begin
     end
 end
 
-// state_exe combine
 always_comb begin
     leds=0;
     leds[15]=time_interupt;

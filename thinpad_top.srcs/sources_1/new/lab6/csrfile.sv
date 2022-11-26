@@ -14,16 +14,9 @@ output reg[31:0] rdata_b,
 
 input wire mtime_exceed_i,
 output reg time_interupt,
-output reg[15:0] leds,
-
-output reg [31:0] mmu_satp_o
+output reg[15:0] leds
 );
 
-reg [31:0] satp; //0x180
-// assgin mmu_satp = satp;
-always_comb begin
-    mmu_satp_o = satp;
-end
 reg [31:0] mtvec;//0x305
 reg [31:0] mscratch;//0x340
 reg [31:0] mepc;//0x341 由于是32位机器 所以最低两位一直是0
@@ -43,8 +36,6 @@ always_ff @ (posedge clk or posedge reset) begin
         // mip <= 0;
     end else if (we) begin
         case(waddr)
-        12'h180:satp <= wdata;
-
         12'h305: mtvec <= wdata;
         12'h340: mscratch <= wdata;
         12'h341: mepc[31:2] <= wdata[31:2];
@@ -55,7 +46,6 @@ always_ff @ (posedge clk or posedge reset) begin
         endcase
     end else if (we_exp) begin
         case(waddr_exp)
-        // I think we donot need to deal with satp here
         12'h305: mtvec <= wdata_exp;
         12'h340: mscratch <= wdata_exp;
         12'h341: mepc[31:2] <= wdata_exp[31:2];

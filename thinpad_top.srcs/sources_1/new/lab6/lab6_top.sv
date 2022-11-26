@@ -117,14 +117,14 @@ module lab6_top (
 
   /* =========== Lab5 Master begin =========== */
   // Lab5 Master => Wishbone MUX (Slave)
-  logic        mmu_wbm_cyc_o;
-  logic        mmu_wbm_stb_o;
-  logic        mmu_wbm_ack_i;
-  logic [31:0] mmu_wbm_adr_o;
-  logic [31:0] mmu_wbm_dat_o;
-  logic [31:0] mmu_wbm_dat_i;
-  logic [ 3:0] mmu_wbm_sel_o;
-  logic        mmu_wbm_we_o;
+  logic        wbm_cyc_o;
+  logic        wbm_stb_o;
+  logic        wbm_ack_i;
+  logic [31:0] wbm_adr_o;
+  logic [31:0] wbm_dat_o;
+  logic [31:0] wbm_dat_i;
+  logic [ 3:0] wbm_sel_o;
+  logic        wbm_we_o;
 
   logic        if_wbm_cyc_o;
   logic        if_wbm_stb_o;
@@ -143,20 +143,6 @@ module lab6_top (
   logic [31:0] mem_wbm_dat_i;
   logic [ 3:0] mem_wbm_sel_o;
   logic        mem_wbm_we_o;
-
-// aribiter to mmu, accroding to CPU
-  logic [31:0] arbiter_mmu_addr_o;
-  logic [31:0] arbiter_mmu_data_i;
-  logic [31:0] arbiter_mmu_data_o;
-  logic        arbiter_mmu_we_o;
-  logic        arbiter_mmu_sel_o;
-  logic        arbiter_mmu_stb_o;
-  logic        arbiter_mmu_cyc_o;
-  logic        arbiter_mmu_ack_i;
-
-// mmu mode and satp
-  logic [1:0] mmu_mode;
-  logic [31:0] mmu_satp;
 
   logic [31:0] imm_gen_o;
   logic [4:0] imm_gen_type;
@@ -211,42 +197,16 @@ module lab6_top (
     .wbm1_rty_o(),
     .wbm1_cyc_i(mem_wbm_cyc_o),
 
-    .wbs_adr_o(arbiter_mmu_addr_o),
-    .wbs_dat_i(arbiter_mmu_data_i),
-    .wbs_dat_o(arbiter_mmu_data_o),
-    .wbs_we_o (arbiter_mmu_we_o),
-    .wbs_sel_o(arbiter_mmu_sel_o),
-    .wbs_stb_o(arbiter_mmu_stb_o),
-    .wbs_cyc_o(arbiter_mmu_cyc_o),
-    .wbs_ack_i(arbiter_mmu_ack_i),
+    .wbs_adr_o(wbm_adr_o),
+    .wbs_dat_i(wbm_dat_i),
+    .wbs_dat_o(wbm_dat_o),
+    .wbs_we_o (wbm_we_o),
+    .wbs_sel_o(wbm_sel_o),
+    .wbs_stb_o(wbm_stb_o),
+    .wbs_ack_i(wbm_ack_i),
     .wbs_err_i('0),
-    .wbs_rty_i('0)
-  );
-
-  mmu u_mmu (
-    .clk (sys_clk),
-    .rst (sys_rst),
-
-    .arbiter_addr_i(arbiter_mmu_addr_o),
-    .arbiter_data_i(arbiter_mmu_data_o),
-    .arbiter_data_o(arbiter_mmu_data_i),
-    .arbiter_we_i(arbiter_mmu_we_o),
-    .arbiter_sel_i(arbiter_mmu_sel_o),
-    .arbiter_stb_i(arbiter_mmu_stb_o),
-    .arbiter_cyc_i(arbiter_mmu_cyc_o),
-    .arbiter_ack_o(arbiter_mmu_ack_i),
-
-    .mux_addr_o(mmu_wbm_adr_o),
-    .mux_data_i(mmu_wbm_dat_o),
-    .mux_data_o(mmu_wbm_dat_i),
-    .mux_we_o(mmu_wbm_we_o),
-    .mux_sel_o(mmu_wbm_sel_o),
-    .mux_stb_o(mmu_wbm_stb_o),
-    .mux_cyc_o(mmu_wbm_cyc_o),
-    .mux_ack_i(mmu_wbm_ack_i),
-
-    .mode(mmu_mode),
-    .satp(mmu_satp)
+    .wbs_rty_i('0),
+    .wbs_cyc_o(wbm_cyc_o)
   );
 
   pipeline_master #(
@@ -313,10 +273,7 @@ module lab6_top (
     .time_interupt(time_interupt),
     .csr_waddr_exp(csr_waddr_exp),
     .csr_wdata_exp(csr_wdata_exp),
-    .csr_we_exp(csr_we_exp),
-
-    // mmu mode
-    .mmu_mode_o(mmu_mode)
+    .csr_we_exp(csr_we_exp)
   );
 
 
@@ -369,10 +326,7 @@ module lab6_top (
     .raddr_b(csr_raddr_b),
     .rdata_b(csr_rdata_b),
     .mtime_exceed_i(mtime_exceed),
-    .time_interupt(time_interupt),
-
-    // mmu satp
-    .mmu_satp_o(mmu_satp)
+    .time_interupt(time_interupt)
   );
   /* =========== Lab5 Master end =========== */
 
@@ -419,16 +373,16 @@ module lab6_top (
       .rst(sys_rst),
 
       // Master interface (to Lab5 master)
-      .wbm_adr_i(mmu_wbm_adr_o),
-      .wbm_dat_i(mmu_wbm_dat_o),
-      .wbm_dat_o(mmu_wbm_dat_i),
-      .wbm_we_i (mmu_wbm_we_o),
-      .wbm_sel_i(mmu_wbm_sel_o),
-      .wbm_stb_i(mmu_wbm_stb_o),
-      .wbm_ack_o(mmu_wbm_ack_i),
+      .wbm_adr_i(wbm_adr_o),
+      .wbm_dat_i(wbm_dat_o),
+      .wbm_dat_o(wbm_dat_i),
+      .wbm_we_i (wbm_we_o),
+      .wbm_sel_i(wbm_sel_o),
+      .wbm_stb_i(wbm_stb_o),
+      .wbm_ack_o(wbm_ack_i),
       .wbm_err_o(),
       .wbm_rty_o(),
-      .wbm_cyc_i(mmu_wbm_cyc_o),
+      .wbm_cyc_i(wbm_cyc_o),
 
       // Slave interface 0 (to BaseRAM controller)
       // Address range: 0x8000_0000 ~ 0x803F_FFFF
