@@ -71,7 +71,7 @@ module pipeline_master #(
 
     input wire time_interupt,
 
-    output reg mmu_mode;
+    output reg mmu_mode_o
 );
 
 assgin mmu_mode = mode_reg;

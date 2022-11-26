@@ -212,8 +212,8 @@ module lab6_top (
     .wbm1_cyc_i(mem_wbm_cyc_o),
 
     .wbs_adr_o(arbiter_mmu_addr_o),
-    .wbs_dat_i(arbiter_data_i),
-    .wbs_dat_o(arbiter_data_o),
+    .wbs_dat_i(arbiter_mmu_data_i),
+    .wbs_dat_o(arbiter_mmu_data_o),
     .wbs_we_o (arbiter_mmu_we_o),
     .wbs_sel_o(arbiter_mmu_sel_o),
     .wbs_stb_o(arbiter_mmu_stb_o),
@@ -313,7 +313,7 @@ module lab6_top (
     .time_interupt(time_interupt),
     .csr_waddr_exp(csr_waddr_exp),
     .csr_wdata_exp(csr_wdata_exp),
-    .csr_we_exp(csr_we_exp)
+    .csr_we_exp(csr_we_exp),
 
     // mmu mode
     .mmu_mode_o(mmu_mode)
@@ -419,16 +419,16 @@ module lab6_top (
       .rst(sys_rst),
 
       // Master interface (to Lab5 master)
-      .wbm_adr_i(wbm_adr_o),
-      .wbm_dat_i(wbm_dat_o),
-      .wbm_dat_o(wbm_dat_i),
-      .wbm_we_i (wbm_we_o),
-      .wbm_sel_i(wbm_sel_o),
-      .wbm_stb_i(wbm_stb_o),
-      .wbm_ack_o(wbm_ack_i),
+      .wbm_adr_i(mmu_wbm_adr_o),
+      .wbm_dat_i(mmu_wbm_dat_o),
+      .wbm_dat_o(mmu_wbm_dat_i),
+      .wbm_we_i (mmu_wbm_we_o),
+      .wbm_sel_i(mmu_wbm_sel_o),
+      .wbm_stb_i(mmu_wbm_stb_o),
+      .wbm_ack_o(mmu_wbm_ack_i),
       .wbm_err_o(),
       .wbm_rty_o(),
-      .wbm_cyc_i(wbm_cyc_o),
+      .wbm_cyc_i(mmu_wbm_cyc_o),
 
       // Slave interface 0 (to BaseRAM controller)
       // Address range: 0x8000_0000 ~ 0x803F_FFFF
