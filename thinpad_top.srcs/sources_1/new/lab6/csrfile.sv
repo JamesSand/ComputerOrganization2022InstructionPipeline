@@ -16,11 +16,14 @@ input wire mtime_exceed_i,
 output reg time_interupt,
 output reg[15:0] leds,
 
-output reg [31:0] mmu_satp
+output reg [31:0] mmu_satp_o
 );
 
 reg [31:0] satp; //0x180
-assgin mmu_satp = satp;
+// assgin mmu_satp = satp;
+always_comb begin
+    mmu_satp_o = satp;
+end
 reg [31:0] mtvec;//0x305
 reg [31:0] mscratch;//0x340
 reg [31:0] mepc;//0x341 由于是32位机器 所以最低两位一直是0

@@ -372,7 +372,7 @@ module lab6_top (
     .time_interupt(time_interupt),
 
     // mmu satp
-    .mmu_satp(mmu_satp)
+    .mmu_satp_o(mmu_satp)
   );
   /* =========== Lab5 Master end =========== */
 

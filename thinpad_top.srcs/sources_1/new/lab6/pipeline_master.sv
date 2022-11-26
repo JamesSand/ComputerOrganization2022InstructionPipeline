@@ -142,7 +142,10 @@ reg [11:0] exe_mem_wb_csr_waddr_reg;
 reg exe_mem_wb_csr_we_reg;
 
 reg [2:0] mode_reg;//00U,11M
-assgin mmu_mode = mode_reg;
+// assgin mmu_mode = mode_reg;
+always_comb begin
+    mmu_mode_o = mode_reg;
+end
 reg [2:0] temp_mode_reg;
 reg exe_exceptionprocessup_reg;
 reg [31:0] exe_exception_pc_reg;
