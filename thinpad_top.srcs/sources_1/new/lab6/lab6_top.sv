@@ -117,6 +117,18 @@ module lab6_top (
 
   /* =========== Lab5 Master begin =========== */
   // Lab5 Master => Wishbone MUX (Slave)
+
+  // mmu signal
+  logic        mmu_cyc_o;
+  logic        mmu_stb_o;
+  logic        mmu_ack_i;
+  logic [31:0] mmu_adr_o;
+  logic [31:0] mmu_dat_o;
+  logic [31:0] mmu_dat_i;
+  logic [ 3:0] mmu_sel_o;
+  logic        mmu_we_o;
+
+
   logic        wbm_cyc_o;
   logic        wbm_stb_o;
   logic        wbm_ack_i;
@@ -197,16 +209,41 @@ module lab6_top (
     .wbm1_rty_o(),
     .wbm1_cyc_i(mem_wbm_cyc_o),
 
-    .wbs_adr_o(wbm_adr_o),
-    .wbs_dat_i(wbm_dat_i),
-    .wbs_dat_o(wbm_dat_o),
-    .wbs_we_o (wbm_we_o),
-    .wbs_sel_o(wbm_sel_o),
-    .wbs_stb_o(wbm_stb_o),
-    .wbs_ack_i(wbm_ack_i),
+    .wbs_adr_o(mmu_adr_o),
+    .wbs_dat_i(mmu_dat_i),
+    .wbs_dat_o(mmu_dat_o),
+    .wbs_we_o (mmu_we_o),
+    .wbs_sel_o(mmu_sel_o),
+    .wbs_stb_o(mmu_stb_o),
+    .wbs_ack_i(mmu_ack_i),
     .wbs_err_i('0),
     .wbs_rty_i('0),
-    .wbs_cyc_o(wbm_cyc_o)
+    .wbs_cyc_o(mmu_cyc_o)
+  );
+
+  mmu u_mmu (
+    .clk(sys_clk),
+    .rst(sys_rst),
+
+    // arbiter
+    .arbiter_addr_in(mmu_adr_o),
+    .arbiter_data_in(mmu_dat_o),
+    .arbiter_data_out(mmu_dat_i),
+    .arbiter_we_in(mmu_we_o),
+    .arbiter_sel_in(mmu_sel_o),
+    .arbiter_stb_in(mmu_stb_o),
+    .arbiter_cyc_in(mmu_cyc_o),
+    .arbiter_ack_out(mmu_ack_i),
+
+    // mux
+    .mux_addr_out(wbm_adr_o),
+    .mux_data_out(wbm_dat_o),
+    .mux_data_in(wbm_dat_i),
+    .mux_we_out(wbm_we_o),
+    .mux_sel_out(wbm_sel_o),
+    .mux_stb_out(wbm_stb_o),
+    .mux_cyc_out(wbm_cyc_o),
+    .mux_ack_in(wbm_ack_i)
   );
 
   pipeline_master #(

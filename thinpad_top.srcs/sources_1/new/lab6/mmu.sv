@@ -1,6 +1,6 @@
 module mmu (
     input clk,
-    input reset,
+    input rst,
 
     // arbiter
     input wire [31:0] arbiter_addr_in,
