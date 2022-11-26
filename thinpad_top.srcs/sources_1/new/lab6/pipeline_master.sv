@@ -283,8 +283,20 @@ always_ff @ (posedge clk_i) begin
     end else begin
         // instruction analysis here begin 
         if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:25] == 7'b0001001) begin // SFENCE.VMA
-            // implement as nop temporarily
-
+            id_exe_if_branch_reg <= 0;
+            id_exe_exe_alu_a_reg <= 0;
+            id_exe_exe_alu_b_reg <= 0;
+            id_exe_exe_alu_op_reg <= `ALU_OP_ADD;
+            id_exe_mem_wb_cyc_reg <= 0;
+            id_exe_mem_wb_stb_reg <= 0;
+            id_exe_mem_wb_we_reg <= 0;
+            id_exe_mem_load_reg <= 0;
+            id_exe_mem_store_reg <= 0;
+            id_exe_wb_csr_we_reg <= 0;
+            id_exe_wb_csr_waddr_reg <= 0;
+            id_exe_wb_rf_we_reg <= 0;
+            id_exe_rd_reg <= 0;
+            id_exe_exe_exceptionoccur_reg<=0;
         end
         if (if_id_id_inst_reg[6:0] == 7'b1110011 && if_id_id_inst_reg[14:12] == 3'b000 && if_id_id_inst_reg[31:20] == 1) begin //ebreak
             id_exe_if_branch_reg <= 0;
