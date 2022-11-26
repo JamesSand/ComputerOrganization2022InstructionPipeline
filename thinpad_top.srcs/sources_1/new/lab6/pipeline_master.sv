@@ -992,6 +992,7 @@ always_ff @ (posedge clk_i) begin
     end
 end
 
+// state_exe combine
 always_comb begin
     leds=0;
     leds[15]=time_interupt;
