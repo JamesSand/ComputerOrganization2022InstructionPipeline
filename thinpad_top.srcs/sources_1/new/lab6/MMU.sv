@@ -58,15 +58,15 @@ state_p state_page;
 always_ff @(posedge clk) begin
     if(rst) begin
         // clean siganals to arbiter
-        arbiter_data_o <= 32'h0;
-        arbiter_ack_o <= 1'b0;
-        // clean signals to mux
-        mux_addr_o <= 32'h0;
-        mux_data_o <= 32'h0;
-        mux_we_o <= 1'b0;
-        mux_sel_o <= 1'b0;
-        mux_stb_o <= 1'b0;
-        mux_cyc_o <= 1'b0;
+        // arbiter_data_o <= 32'h0;
+        // arbiter_ack_o <= 1'b0;
+        // // clean signals to mux
+        // mux_addr_o <= 32'h0;
+        // mux_data_o <= 32'h0;
+        // mux_we_o <= 1'b0;
+        // mux_sel_o <= 1'b0;
+        // mux_stb_o <= 1'b0;
+        // mux_cyc_o <= 1'b0;
         // reset state
         state_page <= STATE_INIT;
         // reset ppn
