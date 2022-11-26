@@ -66,7 +66,7 @@ always_ff @(posedge clk) begin
         mux_we_o <= 1'b0;
         mux_sel_o <= 1'b0;
         mux_stb_o <= 1'b0;
-        mux_stb_cyc_o <= 1'b0;
+        mux_cyc_o <= 1'b0;
         // reset state
         state_page <= STATE_INIT;
         // reset ppn
@@ -81,7 +81,7 @@ always_ff @(posedge clk) begin
                     if (mode == 2'b00) begin // user mode
                         state_page <= STATE_READ_TABLE_1;
                     end else begin // machine mode and other modes
-                        state_page <= STATE_MACHINE_MODE;
+                        state_page <= STATE_MACHINE_ACTION;
                     end
                 end
             end
@@ -113,11 +113,11 @@ always_ff @(posedge clk) begin
                 end
             end
             STATE_READ_2_DONE : begin
-                state_page <= STATE_READ_PPN;
+                state_page <= STATE_ACTION_PPN;
             end
             STATE_ACTION_PPN: begin
                 if (mux_ack_i) begin
-                    state_page <= STATE_READ_PPN_DONE;
+                    state_page <= STATE_PPN_DONE;
                     // real data is ready
                     mux_data_reg <= mux_data_i;
                 end
@@ -140,7 +140,7 @@ always_comb begin
     mux_cyc_o = 1'b0;
     arbiter_data_o = 32'h0;
     arbiter_ack_o = 1'b0;
-    
+
     case (state_page) 
         // STATE INIT empty
         STATE_MACHINE_ACTION : begin
