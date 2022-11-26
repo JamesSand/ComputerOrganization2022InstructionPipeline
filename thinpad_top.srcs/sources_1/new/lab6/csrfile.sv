@@ -19,9 +19,8 @@ output reg[15:0] leds,
 output reg [31:0] mmu_satp
 );
 
-assgin mmu_satp = satp;
-
 reg [31:0] satp; //0x180
+assgin mmu_satp = satp;
 reg [31:0] mtvec;//0x305
 reg [31:0] mscratch;//0x340
 reg [31:0] mepc;//0x341 由于是32位机器 所以最低两位一直是0

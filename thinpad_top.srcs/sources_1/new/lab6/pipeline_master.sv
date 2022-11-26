@@ -74,8 +74,6 @@ module pipeline_master #(
     output reg mmu_mode_o
 );
 
-assgin mmu_mode = mode_reg;
-
 // state_if 生成的信�???????????
 reg if_stall_i,if_stall_o,if_flush_i,if_flush_o;
 reg [31:0]  if_id_id_pc_now_reg;
@@ -144,6 +142,7 @@ reg [11:0] exe_mem_wb_csr_waddr_reg;
 reg exe_mem_wb_csr_we_reg;
 
 reg [2:0] mode_reg;//00U,11M
+assgin mmu_mode = mode_reg;
 reg [2:0] temp_mode_reg;
 reg exe_exceptionprocessup_reg;
 reg [31:0] exe_exception_pc_reg;
