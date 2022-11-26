@@ -1,6 +1,6 @@
 module mmu (
-    input clk,
-    input rst,
+    input wire clk,
+    input wire rst,
 
     // arbiter
     input wire [31:0] arbiter_addr_in,
@@ -27,6 +27,15 @@ module mmu (
     // satp
     input wire [31:0] satp_in
 );
+
+logic satp_mode;
+logic [21:0] satp_ppn;
+
+// satp decode
+always_comb begin
+    satp_mode = satp_in[31];
+    satp_ppn = satp_in[21:0];
+end
 
 // for test
 always_comb begin
