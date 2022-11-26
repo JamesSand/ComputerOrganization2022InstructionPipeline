@@ -22,20 +22,22 @@ module mmu (
     output reg mux_cyc_out,
     input wire mux_ack_in,
 
-    // user mode
-    
+    // mode
+    input wire [1:0] mode_in,
     // satp
     input wire [31:0] satp_in
 );
 
 logic satp_mode;
 logic [21:0] satp_ppn;
+logic page_table_enable;
 
-// satp decode
 always_comb begin
+    // satp decode
     satp_mode = satp_in[31];
     satp_ppn = satp_in[21:0];
 end
+
 
 // for test
 always_comb begin

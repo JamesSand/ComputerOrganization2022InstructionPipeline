@@ -69,7 +69,9 @@ module pipeline_master #(
     output reg  [31:0] csr_wdata_exp,
     output reg  csr_we_exp=0,
 
-    input wire time_interupt
+    input wire time_interupt,
+
+    output reg [1:0] mode_out // for mmu
 );
 
 // state_if 生成的信�???????????
@@ -140,6 +142,9 @@ reg [11:0] exe_mem_wb_csr_waddr_reg;
 reg exe_mem_wb_csr_we_reg;
 
 reg [2:0] mode_reg;//00U,11M
+always_comb begin
+    mode_out = mode_reg;
+end
 reg [2:0] temp_mode_reg;
 reg exe_exceptionprocessup_reg;
 reg [31:0] exe_exception_pc_reg;

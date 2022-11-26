@@ -127,6 +127,7 @@ module lab6_top (
   logic [31:0] mmu_dat_i;
   logic [ 3:0] mmu_sel_o;
   logic        mmu_we_o;
+  logic [1:0]  mmu_mode;
   logic [31:0] mmu_satp;
 
 
@@ -246,6 +247,8 @@ module lab6_top (
     .mux_cyc_out(wbm_cyc_o),
     .mux_ack_in(wbm_ack_i),
 
+    // mode
+    .mode_in(mmu_mode),
     // satp
     .satp_in(mmu_satp)
   );
@@ -316,7 +319,8 @@ module lab6_top (
     .csr_wdata_exp(csr_wdata_exp),
     .csr_we_exp(csr_we_exp),
 
-    .satp_out(mmu_satp)
+    // mmu
+    .mode_out(mmu_mode)
   );
 
 
@@ -369,7 +373,9 @@ module lab6_top (
     .raddr_b(csr_raddr_b),
     .rdata_b(csr_rdata_b),
     .mtime_exceed_i(mtime_exceed),
-    .time_interupt(time_interupt)
+    .time_interupt(time_interupt),
+
+    .satp_out(mmu_satp)
   );
   /* =========== Lab5 Master end =========== */
 
