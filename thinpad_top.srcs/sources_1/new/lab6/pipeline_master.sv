@@ -69,8 +69,12 @@ module pipeline_master #(
     output reg  [31:0] csr_wdata_exp,
     output reg  csr_we_exp=0,
 
-    input wire time_interupt
+    input wire time_interupt,
+
+    output reg mmu_mode;
 );
+
+assgin mmu_mode = mode_reg;
 
 // state_if 生成的信�???????????
 reg if_stall_i,if_stall_o,if_flush_i,if_flush_o;

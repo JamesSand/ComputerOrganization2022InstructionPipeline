@@ -14,8 +14,12 @@ output reg[31:0] rdata_b,
 
 input wire mtime_exceed_i,
 output reg time_interupt,
-output reg[15:0] leds
+output reg[15:0] leds,
+
+output reg [31:0] mmu_satp
 );
+
+assgin mmu_satp = satp;
 
 reg [31:0] satp; //0x180
 reg [31:0] mtvec;//0x305
