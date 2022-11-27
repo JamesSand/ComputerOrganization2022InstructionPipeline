@@ -44,7 +44,7 @@ always_comb begin
     satp_ppn = satp_in[21:0];
 
     // page table enable
-    if (satp_mode && (mode_in != 2'b11) && (((32'b0 < arbiter_addr_in) && (arbiter_addr_in < 32'h002FFFFF)) || ((32'h7FC10000 < arbiter_addr_in) && ( arbiter_addr_in < 32'h7FFFFFFF)) )) begin
+    if (satp_mode && (mode_in != 2'b11) && (((32'h7FC10000 <= arbiter_addr_in) && ( arbiter_addr_in <= 32'h7FFFFFFF)) )) begin
         page_table_enable = 1;
     end else begin
         page_table_enable = 0;
@@ -169,7 +169,7 @@ always_comb begin
             arbiter_ack_out = 0;
         end
         STATE_READ_1_ACTION : begin
-            mux_addr_out = satp_ppn << 12 + vpn_1 << 2;
+            mux_addr_out = {satp_ppn[19:0], vpn_1, 2'b00};
             mux_data_out = 0;
             mux_we_out = 0; // read
             mux_sel_out = 4'b1111;
@@ -189,7 +189,7 @@ always_comb begin
             arbiter_data_out = 0;
         end
         STATE_READ_2_ACTION : begin
-            mux_addr_out = pte_1_ppn_1 << 22 + pte_1_ppn_0 << 12 + vpn_2 << 2;
+            mux_addr_out = {pte_1_ppn_1[9:0], pte_1_ppn_0, vpn_2, 2'b00};
             mux_data_out = 0;
             mux_we_out = 0; // read
             mux_sel_out = 4'b1111;
@@ -209,7 +209,7 @@ always_comb begin
             arbiter_data_out = 0;
         end
         STATE_PPN_ACTION : begin
-            mux_addr_out = pte_2_ppn_1 << 22 + pte_2_ppn_0 << 12 + offset;
+            mux_addr_out = {pte_2_ppn_1[9:0], pte_2_ppn_0, offset};
             mux_data_out = 0;
             mux_we_out = 0; // read
             mux_sel_out = arbiter_sel_in;
