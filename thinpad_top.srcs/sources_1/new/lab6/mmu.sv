@@ -44,9 +44,9 @@ always_comb begin
     satp_ppn = satp_in[21:0];
 
     // page table enable
-    if (satp_mode && (mode_in != 2'b11) && (32'h7FC10000 <= arbiter_addr_in) && ( arbiter_addr_in <= 32'h7FFFFFFF) && arbiter_cyc_in) begin
+    if (satp_mode && (mode_in != 2'b11) && (32'h7FC10000 <= arbiter_addr_in) && ( arbiter_addr_in <= 32'h7FFFFFFF) && arbiter_stb_in && arbiter_cyc_in) begin
         page_table_enable = 1;
-    end else if (satp_mode && (mode_in != 2'b11) && (32'h00000000 <= arbiter_addr_in) && ( arbiter_addr_in <= 32'h002FFFFF) && arbiter_cyc_in) begin
+    end else if (satp_mode && (mode_in != 2'b11) && (32'h00000000 <= arbiter_addr_in) && ( arbiter_addr_in <= 32'h002FFFFF) && arbiter_stb_in && arbiter_cyc_in) begin
         page_table_enable = 1;
     end else begin
         page_table_enable = 0;
