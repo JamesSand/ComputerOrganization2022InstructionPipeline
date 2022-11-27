@@ -212,8 +212,8 @@ always_comb begin
         end
         STATE_PPN_ACTION : begin
             mux_addr_out = {pte_2_ppn_1[9:0], pte_2_ppn_0, offset};
-            mux_data_out = 0;
-            mux_we_out = 0; // read
+            mux_data_out = arbiter_data_in;
+            mux_we_out = arbiter_we_in; // read
             mux_sel_out = arbiter_sel_in;
             mux_stb_out = 1;
             mux_cyc_out = 1;
