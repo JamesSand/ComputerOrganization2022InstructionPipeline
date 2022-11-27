@@ -44,7 +44,7 @@ always_comb begin
     satp_ppn = satp_in[21:0];
 
     // page table enable
-    if (satp_mode && (mode_in != 2'b11) && (arbiter_addr_in != 32'h80000100)) begin
+    if (satp_mode && (mode_in != 2'b11) && (((32'b0 < arbiter_addr_in) && (arbiter_addr_in < 32'h002FFFFF)) || ((32'h7FC10000 < arbiter_addr_in) && ( arbiter_addr_in < 32'h7FFFFFFF)) )) begin
         page_table_enable = 1;
     end else begin
         page_table_enable = 0;
