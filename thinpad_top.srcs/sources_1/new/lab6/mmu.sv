@@ -55,7 +55,6 @@ always_comb begin
     vpn_1 = arbiter_addr_in[31:22];
     vpn_2 = arbiter_addr_in[21:12];
     offset = arbiter_addr_in[11:0];
-
 end
 
 // -------------------- decode part end ---------------
