@@ -634,56 +634,56 @@ module lab6_top (
   logic [11:0] hdata;
   logic [11:0] vdata;
 
-  always_comb begin : 
-    if (hdata < 266) begin
-      if (vdata < 200) begin
-        video_red = 3'b111;
-        video_green = 0;
-        video_blue = 0;
-      end else if (vdata < 400) begin
-        video_red = 0;
-        video_green = 3'b111;
-        video_blue = 0;
-      end else begin
-        video_red = 0;
-        video_green = 0;
-        video_blue = 2'b11;
-      end
-    end else if (hdata < 532) begin
-      if (vdata < 200) begin
-        video_red = 0;
-        video_green = 3'b111;
-        video_blue = 0;
-      end else if (vdata < 400) begin
-        video_red = 0;
-        video_green = 0;
-        video_blue = 2'b11;
-      end else begin
-        video_red = 3'b111;
-        video_green = 0;
-        video_blue = 0;
-      end
-    end else begin
-      if (vdata < 200) begin
-        video_red = 0;
-        video_green = 0;
-        video_blue = 2'b11;
-      end else if (vdata < 400) begin
-        video_red = 3'b111;
-        video_green = 0;
-        video_blue = 0;
-      end else begin
-        video_red = 0;
-        video_green = 3'b111;
-        video_blue = 0;
-      end
-    end
+  // always_comb begin : 
+  //   if (hdata < 12'd266) begin
+  //     if (vdata < 200) begin
+  //       video_red = 3'b111;
+  //       video_green = 0;
+  //       video_blue = 0;
+  //     end else if (vdata < 400) begin
+  //       video_red = 0;
+  //       video_green = 3'b111;
+  //       video_blue = 0;
+  //     end else begin
+  //       video_red = 0;
+  //       video_green = 0;
+  //       video_blue = 2'b11;
+  //     end
+  //   end else if (hdata < 12'd532) begin
+  //     if (vdata < 200) begin
+  //       video_red = 0;
+  //       video_green = 3'b111;
+  //       video_blue = 0;
+  //     end else if (vdata < 400) begin
+  //       video_red = 0;
+  //       video_green = 0;
+  //       video_blue = 2'b11;
+  //     end else begin
+  //       video_red = 3'b111;
+  //       video_green = 0;
+  //       video_blue = 0;
+  //     end
+  //   end else begin
+  //     if (vdata < 200) begin
+  //       video_red = 0;
+  //       video_green = 0;
+  //       video_blue = 2'b11;
+  //     end else if (vdata < 400) begin
+  //       video_red = 3'b111;
+  //       video_green = 0;
+  //       video_blue = 0;
+  //     end else begin
+  //       video_red = 0;
+  //       video_green = 3'b111;
+  //       video_blue = 0;
+  //     end
+  //   end
     
-  end
+  // end
 
-  // assign video_red   = hdata < 266 ? 3'b111 : 0;  // 红色竖条
-  // assign video_green = hdata < 532 && hdata >= 266 ? 3'b111 : 0;  // 绿色竖条
-  // assign video_blue  = hdata >= 532 ? 2'b11 : 0;  // 蓝色竖条
+  assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
+  assign video_green = (hdata < 532 vdata < 400) && hdata >= 266 ? 3'b111 : 0;  // 绿色竖条
+  assign video_blue  = (hdata >= 532 vdata <= 600) ? 2'b11 : 0;  // 蓝色竖条
   assign video_clk   = clk_50M;
   vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .clk        (clk_50M),
@@ -693,5 +693,20 @@ module lab6_top (
       .vsync      (video_vsync),
       .data_enable(video_de)
   );
+
+//   blk_mem_gen_0 vga_mem(
+//     // cpu to vga mem
+//     .clka(my_clk), // my clock 10M
+//     .ena(video_mem_c_e), // 总使能端，教程里边要选需要势能端
+//     .wea(video_mem_w_e), // write enable
+//     .addra(video_mem_w_addr), 
+//     .dina(video_mem_w_data), // data in a 
+
+//     // vga mem to display
+//     .clkb(clk_50M),
+//     .enb(1'b1),
+//     .addrb(video_mem_r_addr),
+//     .doutb(video_mem_r_data) // data out
+// );
 
 endmodule
