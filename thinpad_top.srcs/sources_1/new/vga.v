@@ -14,11 +14,11 @@
 //
 module vga #(
     parameter WIDTH = 0,
-    HSIZE = 0,
+    HSIZE = 0, // 800
     HFP = 0,
     HSP = 0,
     HMAX = 0,
-    VSIZE = 0,
+    VSIZE = 0, // 600
     VFP = 0,
     VSP = 0,
     VMAX = 0,

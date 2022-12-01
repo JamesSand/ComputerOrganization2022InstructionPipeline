@@ -627,16 +627,68 @@ module lab6_top (
 
   /* =========== Lab5 Slaves end =========== */
 
+// h stands for horizontal 800
+// v stands for vertical 600
+
   // 图像输出演示，分辨率 800x600@75Hz，像素时钟为 50MHz
   logic [11:0] hdata;
-  assign video_red   = hdata < 266 ? 3'b111 : 0;  // 红色竖条
-  assign video_green = hdata < 532 && hdata >= 266 ? 3'b111 : 0;  // 绿色竖条
-  assign video_blue  = hdata >= 532 ? 2'b11 : 0;  // 蓝色竖条
+  logic [11:0] vdata;
+
+  always_comb begin : 
+    if (hdata < 266) begin
+      if (vdata < 200) begin
+        video_red = 3'b111;
+        video_green = 0;
+        video_blue = 0;
+      end else if (vdata < 400) begin
+        video_red = 0;
+        video_green = 3'b111;
+        video_blue = 0;
+      end else begin
+        video_red = 0;
+        video_green = 0;
+        video_blue = 2'b11;
+      end
+    end else if (hdata < 532) begin
+      if (vdata < 200) begin
+        video_red = 0;
+        video_green = 3'b111;
+        video_blue = 0;
+      end else if (vdata < 400) begin
+        video_red = 0;
+        video_green = 0;
+        video_blue = 2'b11;
+      end else begin
+        video_red = 3'b111;
+        video_green = 0;
+        video_blue = 0;
+      end
+    end else begin
+      if (vdata < 200) begin
+        video_red = 0;
+        video_green = 0;
+        video_blue = 2'b11;
+      end else if (vdata < 400) begin
+        video_red = 3'b111;
+        video_green = 0;
+        video_blue = 0;
+      end else begin
+        video_red = 0;
+        video_green = 3'b111;
+        video_blue = 0;
+      end
+    end
+    
+  end
+
+  // assign video_red   = hdata < 266 ? 3'b111 : 0;  // 红色竖条
+  // assign video_green = hdata < 532 && hdata >= 266 ? 3'b111 : 0;  // 绿色竖条
+  // assign video_blue  = hdata >= 532 ? 2'b11 : 0;  // 蓝色竖条
   assign video_clk   = clk_50M;
   vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .clk        (clk_50M),
       .hdata      (hdata),        // 横坐标
-      .vdata      (),             // 纵坐标
+      .vdata      (vdata),             // 纵坐标
       .hsync      (video_hsync),
       .vsync      (video_vsync),
       .data_enable(video_de)
