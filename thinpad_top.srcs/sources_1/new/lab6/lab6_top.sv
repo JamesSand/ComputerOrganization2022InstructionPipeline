@@ -538,7 +538,7 @@ module lab6_top (
 
       // Slave interface 4 (to vga mem)
       // (32'h0100_0000 <= mem_addr_reading && mem_addr_reading <= 32'h0107_52ff)
-      // Address range: 0x0100_0000 ~ 0x0107_52ff
+      // Address range: 0x0100_0000 ~ 0x0107_52ff 4800000
       .wbs4_addr    (32'h0100_0000),
       .wbs4_addr_msk(32'hFFF0_0000),
 
@@ -707,21 +707,21 @@ module lab6_top (
 
 assign video_clk   = clk_50M;
 
-// assign video_red = blk_r_data[2:0];
-// assign video_green = blk_r_data[5:3];
-// assign video_blue = blk_r_data[7:6];
+assign video_red = blk_r_data[2:0];
+assign video_green = blk_r_data[5:3];
+assign video_blue = blk_r_data[7:6];
 
-always_comb begin
-  if (hdata <= 532) begin
-    video_red = blk_r_data[2:0];
-    video_green = blk_r_data[5:3];
-    video_blue = blk_r_data[7:6];
-  end else begin
-    video_red   = 3'b111;  // 红色竖条
-    video_green = 0;  // 绿色竖条
-    video_blue  = 0;  // 蓝色竖条
-  end
-end
+// always_comb begin
+//   if (hdata <= 532) begin
+//     video_red = blk_r_data[2:0];
+//     video_green = blk_r_data[5:3];
+//     video_blue = blk_r_data[7:6];
+//   end else begin
+//     video_red   = 3'b111;  // 红色竖条
+//     video_green = 0;  // 绿色竖条
+//     video_blue  = 0;  // 蓝色竖条
+//   end
+// end
 
 
 
