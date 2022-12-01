@@ -16,7 +16,10 @@ always_comb begin
         4'b0110: alu_y_reg = ~ alu_a;
         4'b0111: alu_y_reg = alu_a << (alu_b)%32;
         4'b1000: alu_y_reg = alu_a >> (alu_b)%32;
-
+        4'b1011: begin//sbset
+                alu_y_reg = alu_b%32;
+                alu_y_reg = alu_a | (1<<alu_y_reg);
+        end
         // begin code of szz
         4'b1100 : begin // sltu
                 if (alu_a < alu_b) begin
@@ -33,7 +36,8 @@ always_comb begin
                 alu_y_reg = alu_a & (~alu_b);
         end
         // end code of szz
-
+        //szzsb
+        
         // 4'b1001: begin
         //     alu_y_reg = alu_a >> (alu_b)%16;
         //     temp_reg = 17'h10000;

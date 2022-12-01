@@ -10,7 +10,7 @@
 `define ALU_OP_SRL         4'd8
 `define ALU_OP_SRA         4'd9
 `define ALU_OP_ROL         4'd10
-`define ALU_OP_SETB        4'd11 //for lui
+`define ALU_OP_SBSET        4'd11 //for sbset
 `define ALU_OP_SLTU        4'd12 // for sltu
 `define ALU_OP_CSRS        4'd13 // for csrrs
 `define ALU_OP_CSRC        4'd14 // for csrrc
