@@ -71,13 +71,13 @@ module lab6_top (
     input wire dm9k_int,
 
     // 图像输出信号
-    output wire [2:0] video_red,    // 红色像素�??3 �??
-    output wire [2:0] video_green,  // 绿色像素�??3 �??
-    output wire [1:0] video_blue,   // 蓝色像素�??2 �??
-    output wire       video_hsync,  // 行同步（水平同步）信�??
-    output wire       video_vsync,  // 场同步（垂直同步）信�??
-    output wire       video_clk,    // 像素时钟输出
-    output wire       video_de      // 行数据有效信号，用于区分消隐�??
+    output reg [2:0] video_red,    // 红色像素�??3 �??
+    output reg [2:0] video_green,  // 绿色像素�??3 �??
+    output reg [1:0] video_blue,   // 蓝色像素�??2 �??
+    output reg       video_hsync,  // 行同步（水平同步）信�??
+    output reg       video_vsync,  // 场同步（垂直同步）信�??
+    output reg       video_clk,    // 像素时钟输出
+    output reg       video_de      // 行数据有效信号，用于区分消隐�??
 );
 
   /* =========== Demo code begin =========== */
