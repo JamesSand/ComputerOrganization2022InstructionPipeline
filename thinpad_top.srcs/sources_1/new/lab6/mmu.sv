@@ -22,6 +22,13 @@ module mmu (
     output reg mux_cyc_out,
     input wire mux_ack_in,
 
+    // TLB
+    output reg [20:0] tlb_vpn_o,
+    output reg [20:0] tlb_ppn_o,
+    output reg tlb_we_o,
+    input wire [20:0] tlb_ppn_i,
+    input wire tlb_hit_i,
+
     // mode
     input wire [1:0] mode_in,
     // satp
@@ -68,7 +75,8 @@ typedef enum logic [2:0] {
     STATE_READ_2_ACTION = 3,
     STATE_READ_2_DONE = 4,
     STATE_PPN_ACTION = 5,
-    STATE_PPN_DONE = 6
+    STATE_PPN_DONE = 6,
+    STATE_SEARCH_TLB = 7
 } state_p;
 
 state_p page_table_state;
@@ -96,6 +104,9 @@ always_ff @ (posedge clk) begin
         pte_1 <= 32'b0;
         pte_2 <= 32'b0;
         arbiter_return_data_out <= 32'b0;
+        tlb_vpn_o <= 20'b0;
+        tlb_ppn_o <= 20'b0;
+        tlb_we_o <= 1'b0;
     end else begin
         case (page_table_state)
         STATE_INIT: begin
@@ -103,6 +114,16 @@ always_ff @ (posedge clk) begin
                 pte_1 <= 32'b0;
                 pte_2 <= 32'b0;
                 arbiter_return_data_out <= 32'b0;
+                tlb_vpn_o <= {vpn_1, vpn_2};
+                tlb_we_o <= 1'b0;
+                page_table_state <= STATE_SEARCH_TLB;
+            end
+        end
+
+        STATE_SEARCH_TLB: begin
+            if (tlb_hit_i) begin
+                page_table_state <= STATE_PPN_ACTION;
+            end else begin
                 page_table_state <= STATE_READ_1_ACTION;
             end
         end
@@ -136,10 +157,19 @@ always_ff @ (posedge clk) begin
                 // store real data
                 arbiter_return_data_out <= mux_data_in;
                 page_table_state <= STATE_PPN_DONE;
+
+                // update TLB if TLB missed
+                if (tlb_hit_i == 1'b0) begin
+                    tlb_ppn_o <= {pte_2_ppn_1[9:0], pte_2_ppn_0};
+                    tlb_we_o <= 1'b1;
+                end
             end
         end
 
         STATE_PPN_DONE : begin
+            tlb_vpn_o <= 20'b0;
+            tlb_ppn_o <= 20'b0;
+            tlb_we_o <= 1'b0;
             page_table_state <= STATE_INIT;
         end
 
@@ -160,6 +190,16 @@ always_comb begin
     if (page_table_enable) begin
         case (page_table_state)
         STATE_INIT: begin
+            mux_addr_out = 0;
+            mux_data_out = 0;
+            mux_we_out = 0;
+            mux_sel_out = 0;
+            mux_stb_out = 0;
+            mux_cyc_out = 0;
+            arbiter_data_out = 0;
+            arbiter_ack_out = 0;
+        end
+        STATE_SEARCH_TLB: begin
             mux_addr_out = 0;
             mux_data_out = 0;
             mux_we_out = 0;
@@ -210,7 +250,11 @@ always_comb begin
             arbiter_data_out = 0;
         end
         STATE_PPN_ACTION : begin
-            mux_addr_out = {pte_2_ppn_1[9:0], pte_2_ppn_0, offset};
+            if (tlb_hit_i) begin
+                mux_addr_out = {tlb_ppn_i, offset};
+            end else begin
+                mux_addr_out = {pte_2_ppn_1[9:0], pte_2_ppn_0, offset};
+            end
             mux_data_out = arbiter_data_in;
             mux_we_out = arbiter_we_in; // read
             mux_sel_out = arbiter_sel_in;
