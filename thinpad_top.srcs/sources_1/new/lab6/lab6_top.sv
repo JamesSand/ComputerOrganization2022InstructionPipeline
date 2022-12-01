@@ -665,8 +665,11 @@ module lab6_top (
   logic [7:0] blk_w_data;
   logic [18:0] blk_w_addr;
 
+  logic [18:0] vga_r_addr;
   logic [18:0] blk_r_addr;
   logic [7:0] blk_r_data;
+
+  assign blk_r_addr = vga_r_addr + 2;
 
   blk_controller u_blk_controller (
     .clk (sys_clk),
@@ -704,13 +707,23 @@ module lab6_top (
 
 assign video_clk   = clk_50M;
 
-// assign video_red = blk_r_data[2:0];
-// assign video_green = blk_r_data[5:3];
-// assign video_blue = blk_r_data[7:6];
+assign video_red = blk_r_data[2:0];
+assign video_green = blk_r_data[5:3];
+assign video_blue = blk_r_data[7:6];
 
-assign video_red   = (hdata < 266) ? 3'b111 : 0;  // 红色竖条
-assign video_green = (hdata < 532) && (hdata >= 266) ? 3'b111 : 0;  // 绿色竖条
-assign video_blue  = (hdata >= 532) ? 2'b11 : 0;  // 蓝色竖条
+// always_comb begin
+//   if (blk_r_data != 0) begin
+//     video_red = blk_r_data[2:0];
+//     video_green = blk_r_data[5:3];
+//     video_blue = blk_r_data[7:6];
+//   end else begin
+//     video_red   = (hdata < 266) ? 3'b111 : 0;  // 红色竖条
+//     video_green = (hdata < 532) && (hdata >= 266) ? 3'b111 : 0;  // 绿色竖条
+//     video_blue  = (hdata >= 532) ? 2'b11 : 0;  // 蓝色竖条
+//   end
+// end
+
+
 
 vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .clk        (clk_50M),
@@ -720,7 +733,7 @@ vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .hsync      (video_hsync),
       .vsync      (video_vsync),
       .data_enable(video_de),
-      .addr_out (blk_r_addr)
+      .addr_out (vga_r_addr)
   );
 
 
