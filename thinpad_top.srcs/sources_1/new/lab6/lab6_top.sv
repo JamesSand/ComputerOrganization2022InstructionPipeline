@@ -711,17 +711,17 @@ assign video_red = blk_r_data[2:0];
 assign video_green = blk_r_data[5:3];
 assign video_blue = blk_r_data[7:6];
 
-// always_comb begin
-//   if (blk_r_data != 0) begin
-//     video_red = blk_r_data[2:0];
-//     video_green = blk_r_data[5:3];
-//     video_blue = blk_r_data[7:6];
-//   end else begin
-//     video_red   = (hdata < 266) ? 3'b111 : 0;  // 红色竖条
-//     video_green = (hdata < 532) && (hdata >= 266) ? 3'b111 : 0;  // 绿色竖条
-//     video_blue  = (hdata >= 532) ? 2'b11 : 0;  // 蓝色竖条
-//   end
-// end
+always_comb begin
+  if (hdata <= 532) begin
+    video_red = blk_r_data[2:0];
+    video_green = blk_r_data[5:3];
+    video_blue = blk_r_data[7:6];
+  end else begin
+    video_red   = 3'b111;  // 红色竖条
+    video_green = 0;  // 绿色竖条
+    video_blue  = 0;  // 蓝色竖条
+  end
+end
 
 
 
