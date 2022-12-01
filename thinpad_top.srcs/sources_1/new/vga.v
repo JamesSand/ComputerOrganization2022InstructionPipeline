@@ -68,11 +68,11 @@ module vga #(
     if (rst) begin
       addr_out <= 0;
     end else begin
-      if (addr >= 480000) begin
-            addr <= 0;
+      if (addr_out >= 480000) begin
+            addr_out <= 0;
       end
       else if(data_enable) begin
-          addr <= addr + 1;
+          addr_out <= addr_out + 1;
       end
     end
   end

@@ -447,6 +447,15 @@ module lab6_top (
   logic [3:0] wbs3_sel_o;
   logic wbs3_we_o;
 
+  logic wbs4_cyc_o;
+  logic wbs4_stb_o;
+  logic wbs4_ack_i;
+  logic [31:0] wbs4_adr_o;
+  logic [31:0] wbs4_dat_o;
+  logic [31:0] wbs4_dat_i;
+  logic [3:0] wbs4_sel_o;
+  logic wbs4_we_o;
+
   wb_mux_4 wb_mux (
       .clk(sys_clk),
       .rst(sys_rst),
@@ -525,7 +534,24 @@ module lab6_top (
       .wbs3_ack_i(wbs3_ack_i),
       .wbs3_err_i('0),
       .wbs3_rty_i('0),
-      .wbs3_cyc_o(wbs3_cyc_o)
+      .wbs3_cyc_o(wbs3_cyc_o),
+
+      // Slave interface 4 (to vga mem)
+      // (32'h0100_0000 <= mem_addr_reading && mem_addr_reading <= 32'h0107_52ff)
+      // Address range: 0x0100_0000 ~ 0x0107_52ff
+      .wbs4_addr    (32'h0100_0000),
+      .wbs4_addr_msk(32'hFFF0_0000),
+
+      .wbs4_adr_o(wbs4_adr_o),
+      .wbs4_dat_i(wbs4_dat_i),
+      .wbs4_dat_o(wbs4_dat_o),
+      .wbs4_we_o (wbs4_we_o),
+      .wbs4_sel_o(wbs4_sel_o),
+      .wbs4_stb_o(wbs4_stb_o),
+      .wbs4_ack_i(wbs4_ack_i),
+      .wbs4_err_i('0),
+      .wbs4_rty_i('0),
+      .wbs4_cyc_o(wbs4_cyc_o)
   );
 
   /* =========== Lab5 MUX end =========== */
@@ -634,9 +660,9 @@ module lab6_top (
   logic [11:0] hdata;
   logic [11:0] vdata;
 
-  assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
-  assign video_green = (hdata < 532 && vdata < 400) && (hdata >= 266 && vdata >= 200) ? 3'b111 : 0;  // 绿色竖条
-  assign video_blue  = (hdata >= 532 && vdata >= 400) ? 2'b11 : 0;  // 蓝色竖条
+  // assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
+  // assign video_green = (hdata < 532 && vdata < 400) && (hdata >= 266 && vdata >= 200) ? 3'b111 : 0;  // 绿色竖条
+  // assign video_blue  = (hdata >= 532 && vdata >= 400) ? 2'b11 : 0;  // 蓝色竖条
 
   // blk write
   logic blk_w_e;
@@ -646,7 +672,24 @@ module lab6_top (
   logic [18:0] blk_r_addr;
   logic [7:0] blk_r_data;
 
-  // blk read
+  blk_controller u_blk_controller (
+    .clk (sys_clk),
+    .rst (sys_rst),
+
+    .addr_in(wbs4_adr_o),
+    .data_in(wbs4_dat_o),
+    .we_in(wbs4_we_o),
+    .sel_in(wbs4_sel_o),
+    .stb_in(wbs4_stb_o),
+    .cyc_in(wbs4_cyc_o),
+    .data_out(wbs4_dat_i),
+    .ack_out(wbs4_ack_i),
+
+    .blk_we_out(blk_w_e),
+    .blk_addr_out(blk_w_addr),
+    .blk_data_out(blk_w_data)
+  );
+
   blk_mem_gen_0 vga_mem(
     // cpu to vga mem
     .clka(sys_clk), // use system clk to write block memory
@@ -661,7 +704,7 @@ module lab6_top (
     .enb(1'b1),
     .addrb(blk_r_addr), // input read data addr
     .doutb(blk_r_data) // output read data
-);
+  );
 
 assign video_clk   = clk_50M;
 assign video_red = blk_r_data[2:0];
@@ -678,5 +721,7 @@ vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .data_enable(video_de),
       .addr_out (blk_r_addr)
   );
+
+
 
 endmodule
