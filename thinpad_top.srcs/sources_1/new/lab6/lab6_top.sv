@@ -682,8 +682,8 @@ module lab6_top (
   // end
 
   assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
-  assign video_green = (hdata < 532 vdata < 400) && hdata >= 266 ? 3'b111 : 0;  // 绿色竖条
-  assign video_blue  = (hdata >= 532 vdata <= 600) ? 2'b11 : 0;  // 蓝色竖条
+  assign video_green = (hdata < 532 && vdata < 400) && (hdata >= 266 && vdata >= 200) ? 3'b111 : 0;  // 绿色竖条
+  assign video_blue  = (hdata >= 532 && vdata >= 400) ? 2'b11 : 0;  // 蓝色竖条
   assign video_clk   = clk_50M;
   vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .clk        (clk_50M),
@@ -694,19 +694,29 @@ module lab6_top (
       .data_enable(video_de)
   );
 
+//   // blk write
+//   logic blk_w_e;
+//   logic [7:0] blk_w_data;
+//   logic [18:0] blk_w_addr;
+
+//   logic [18:0] blk_r_addr;
+//   logic [7:0] blk_r_data;
+
+//   // blk read
 //   blk_mem_gen_0 vga_mem(
 //     // cpu to vga mem
-//     .clka(my_clk), // my clock 10M
-//     .ena(video_mem_c_e), // 总使能端，教程里边要选需要势能端
-//     .wea(video_mem_w_e), // write enable
-//     .addra(video_mem_w_addr), 
-//     .dina(video_mem_w_data), // data in a 
+//     .clka(sys_clk), // use system clk to write block memory
+//     .ena(1'b1), 
+
+//     .wea(blk_w_e), // write enable
+//     .addra(blk_w_addr), // input write address
+//     .dina(blk_w_data), // input data to blk
 
 //     // vga mem to display
 //     .clkb(clk_50M),
 //     .enb(1'b1),
-//     .addrb(video_mem_r_addr),
-//     .doutb(video_mem_r_data) // data out
+//     .addrb(blk_r_addr), // input read data addr
+//     .doutb(blk_r_data) // output read data
 // );
 
 endmodule
