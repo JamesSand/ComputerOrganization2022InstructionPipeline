@@ -47,6 +47,75 @@ always_comb begin
         //     alu_y_reg = alu_y_reg | temp_reg[15:0];
         // end
         // 4'b1010: alu_y_reg = (alu_a << (alu_b)%16) | (alu_a >> (16 - (alu_b)%16));
+        4'b1001: begin//pcnt
+        alu_y_reg=0;
+        if(alu_a[0]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[1]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[2]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[3]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[4]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[5]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[6]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[7]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[8]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[9]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[10]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[11]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[12]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[13]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[14]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[15]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[16]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[17]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[18]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[19]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[20]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[21]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[22]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[23]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[24]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[25]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[26]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[27]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[28]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[29]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[30]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        if(alu_a[31]==1) begin alu_y_reg = alu_y_reg+1; end
+        else begin alu_y_reg = alu_y_reg; end
+        end
+
+
         4'b1010: begin//clz
         if (alu_a[31]==1) begin
                 alu_y_reg = 0;
