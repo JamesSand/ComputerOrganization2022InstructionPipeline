@@ -707,9 +707,9 @@ module lab6_top (
 
 assign video_clk   = clk_50M;
 
-assign video_red = blk_r_data[2:0];
-assign video_green = blk_r_data[5:3];
-assign video_blue = blk_r_data[7:6];
+// assign video_red = blk_r_data[2:0];
+// assign video_green = blk_r_data[5:3];
+// assign video_blue = blk_r_data[7:6];
 
 always_comb begin
   if (hdata <= 532) begin
