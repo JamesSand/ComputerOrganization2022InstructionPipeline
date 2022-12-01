@@ -634,89 +634,49 @@ module lab6_top (
   logic [11:0] hdata;
   logic [11:0] vdata;
 
-  // always_comb begin : 
-  //   if (hdata < 12'd266) begin
-  //     if (vdata < 200) begin
-  //       video_red = 3'b111;
-  //       video_green = 0;
-  //       video_blue = 0;
-  //     end else if (vdata < 400) begin
-  //       video_red = 0;
-  //       video_green = 3'b111;
-  //       video_blue = 0;
-  //     end else begin
-  //       video_red = 0;
-  //       video_green = 0;
-  //       video_blue = 2'b11;
-  //     end
-  //   end else if (hdata < 12'd532) begin
-  //     if (vdata < 200) begin
-  //       video_red = 0;
-  //       video_green = 3'b111;
-  //       video_blue = 0;
-  //     end else if (vdata < 400) begin
-  //       video_red = 0;
-  //       video_green = 0;
-  //       video_blue = 2'b11;
-  //     end else begin
-  //       video_red = 3'b111;
-  //       video_green = 0;
-  //       video_blue = 0;
-  //     end
-  //   end else begin
-  //     if (vdata < 200) begin
-  //       video_red = 0;
-  //       video_green = 0;
-  //       video_blue = 2'b11;
-  //     end else if (vdata < 400) begin
-  //       video_red = 3'b111;
-  //       video_green = 0;
-  //       video_blue = 0;
-  //     end else begin
-  //       video_red = 0;
-  //       video_green = 3'b111;
-  //       video_blue = 0;
-  //     end
-  //   end
-    
-  // end
-
   assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
   assign video_green = (hdata < 532 && vdata < 400) && (hdata >= 266 && vdata >= 200) ? 3'b111 : 0;  // 绿色竖条
   assign video_blue  = (hdata >= 532 && vdata >= 400) ? 2'b11 : 0;  // 蓝色竖条
-  assign video_clk   = clk_50M;
-  vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
+
+  // blk write
+  logic blk_w_e;
+  logic [7:0] blk_w_data;
+  logic [18:0] blk_w_addr;
+
+  logic [18:0] blk_r_addr;
+  logic [7:0] blk_r_data;
+
+  // blk read
+  blk_mem_gen_0 vga_mem(
+    // cpu to vga mem
+    .clka(sys_clk), // use system clk to write block memory
+    .ena(1'b1), 
+
+    .wea(blk_w_e), // write enable
+    .addra(blk_w_addr), // input write address
+    .dina(blk_w_data), // input data to blk
+
+    // vga mem to display
+    .clkb(clk_50M),
+    .enb(1'b1),
+    .addrb(blk_r_addr), // input read data addr
+    .doutb(blk_r_data) // output read data
+);
+
+assign video_clk   = clk_50M;
+assign video_red = blk_r_data[2:0];
+assign video_green = blk_r_data[5:3];
+assign video_blue = blk_r_data[7:6];
+
+vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .clk        (clk_50M),
+      .rst        (sys_rst),
       .hdata      (hdata),        // 横坐标
       .vdata      (vdata),             // 纵坐标
       .hsync      (video_hsync),
       .vsync      (video_vsync),
-      .data_enable(video_de)
+      .data_enable(video_de),
+      .addr_out (blk_r_addr)
   );
-
-//   // blk write
-//   logic blk_w_e;
-//   logic [7:0] blk_w_data;
-//   logic [18:0] blk_w_addr;
-
-//   logic [18:0] blk_r_addr;
-//   logic [7:0] blk_r_data;
-
-//   // blk read
-//   blk_mem_gen_0 vga_mem(
-//     // cpu to vga mem
-//     .clka(sys_clk), // use system clk to write block memory
-//     .ena(1'b1), 
-
-//     .wea(blk_w_e), // write enable
-//     .addra(blk_w_addr), // input write address
-//     .dina(blk_w_data), // input data to blk
-
-//     // vga mem to display
-//     .clkb(clk_50M),
-//     .enb(1'b1),
-//     .addrb(blk_r_addr), // input read data addr
-//     .doutb(blk_r_data) // output read data
-// );
 
 endmodule
