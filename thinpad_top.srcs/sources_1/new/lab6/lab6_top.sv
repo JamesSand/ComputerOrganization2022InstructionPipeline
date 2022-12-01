@@ -660,10 +660,6 @@ module lab6_top (
   logic [11:0] hdata;
   logic [11:0] vdata;
 
-  // assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
-  // assign video_green = (hdata < 532 && vdata < 400) && (hdata >= 266 && vdata >= 200) ? 3'b111 : 0;  // 绿色竖条
-  // assign video_blue  = (hdata >= 532 && vdata >= 400) ? 2'b11 : 0;  // 蓝色竖条
-
   // blk write
   logic blk_w_e;
   logic [7:0] blk_w_data;
@@ -707,9 +703,14 @@ module lab6_top (
   );
 
 assign video_clk   = clk_50M;
-assign video_red = blk_r_data[2:0];
-assign video_green = blk_r_data[5:3];
-assign video_blue = blk_r_data[7:6];
+
+// assign video_red = blk_r_data[2:0];
+// assign video_green = blk_r_data[5:3];
+// assign video_blue = blk_r_data[7:6];
+
+assign video_red   = (hdata < 266 && vdata < 200) ? 3'b111 : 0;  // 红色竖条
+  assign video_green = (hdata < 532 && vdata < 400) && (hdata >= 266 && vdata >= 200) ? 3'b111 : 0;  // 绿色竖条
+  assign video_blue  = (hdata >= 532 && vdata >= 400) ? 2'b11 : 0;  // 蓝色竖条
 
 vga #(12, 800, 856, 976, 1040, 600, 637, 643, 666, 1, 1) vga800x600at75 (
       .clk        (clk_50M),
