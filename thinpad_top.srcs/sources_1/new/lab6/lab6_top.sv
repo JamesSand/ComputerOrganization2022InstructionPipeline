@@ -670,8 +670,8 @@ module lab6_top (
 
   // blk write
   logic blk_w_e;
-  logic [31:0] blk_w_data;
-  logic [16:0] blk_w_addr;
+  logic [7:0] blk_w_data;
+  logic [18:0] blk_w_addr;
 
   logic [18:0] vga_r_addr;
   logic [18:0] blk_r_addr;
@@ -697,23 +697,7 @@ module lab6_top (
     .blk_data_out(blk_w_data)
   );
 
-  // blk_mem_gen_0 vga_mem(
-  //   // cpu to vga mem
-  //   .clka(sys_clk), // use system clk to write block memory
-  //   .ena(1'b1), 
-
-  //   .wea(blk_w_e), // write enable
-  //   .addra(blk_w_addr), // input write address
-  //   .dina(blk_w_data), // input data to blk
-
-  //   // vga mem to display
-  //   .clkb(clk_50M),
-  //   .enb(1'b1),
-  //   .addrb(blk_r_addr), // input read data addr
-  //   .doutb(blk_r_data) // output read data
-  // );
-
-  blk_mem_gen_2 vga_mem(
+  blk_mem_gen_0 vga_mem(
     // cpu to vga mem
     .clka(sys_clk), // use system clk to write block memory
     .ena(1'b1), 
