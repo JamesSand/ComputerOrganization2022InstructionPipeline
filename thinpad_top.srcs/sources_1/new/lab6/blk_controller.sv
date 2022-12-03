@@ -63,8 +63,8 @@ always_comb begin
 
         STATE_WRITE : begin
             blk_we_out = 1;
-            blk_addr_out = addr_in[18:2];
-            blk_data_out = data_in;
+            blk_addr_out = addr_in[18:0];
+            blk_data_out = data_in[7:0];
         end
 
         STATE_DONE : begin
