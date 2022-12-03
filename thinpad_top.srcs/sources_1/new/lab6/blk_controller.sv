@@ -16,8 +16,8 @@ module blk_controller(
 
     // blk
     output reg blk_we_out,
-    output reg [18:0] blk_addr_out,
-    output reg [7:0] blk_data_out
+    output reg [16:0] blk_addr_out,
+    output reg [31:0] blk_data_out
 );
 
 typedef enum logic [2:0] {
@@ -63,8 +63,8 @@ always_comb begin
 
         STATE_WRITE : begin
             blk_we_out = 1;
-            blk_addr_out = addr_in[18:0];
-            blk_data_out = data_in[7:0];
+            blk_addr_out = addr_in[16:0];
+            blk_data_out = data_in;
         end
 
         STATE_DONE : begin
