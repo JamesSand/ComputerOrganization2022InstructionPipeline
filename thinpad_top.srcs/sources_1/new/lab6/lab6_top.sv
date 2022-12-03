@@ -670,8 +670,8 @@ module lab6_top (
 
   // blk write
   logic blk_w_e;
-  logic [7:0] blk_w_data;
-  logic [18:0] blk_w_addr;
+  logic [31:0] blk_w_data;
+  logic [16:0] blk_w_addr;
 
   logic [18:0] vga_r_addr;
   logic [18:0] blk_r_addr;
