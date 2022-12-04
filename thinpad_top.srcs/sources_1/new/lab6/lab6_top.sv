@@ -677,7 +677,7 @@ module lab6_top (
   logic [18:0] blk_r_addr;
   logic [7:0] blk_r_data;
 
-  assign blk_r_addr = vga_r_addr + 2;
+  assign blk_r_addr = vga_r_addr;
 
   blk_controller u_blk_controller (
     .clk (sys_clk),
