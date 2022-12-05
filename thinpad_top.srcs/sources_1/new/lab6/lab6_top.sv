@@ -687,9 +687,16 @@ module lab6_top (
   logic [7:0] blk_r_data;
 
   // assign blk_r_addr = {vga_r_addr[18:4], 4'b00};
+
+  logic [11:0] h_16;
+  logic [11:0] v_16;
+
+  assign h_16 = {hdata[11:4], 4'b0000};
+  assign v_16 = {vdata[11:4], 4'b0000};
+  assign blk_r_addr = h_16 + 50 * v_16;
   
-  assign vga_calc_addr = hdata + vdata * 800;
-  assign blk_r_addr = {vga_calc_addr[18:4], 4'b00};
+  // assign vga_calc_addr = hdata + vdata * 800;
+  // assign blk_r_addr = {vga_calc_addr[18:4], 4'b00};
 
   blk_controller u_blk_controller (
     .clk (sys_clk),
