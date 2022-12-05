@@ -690,8 +690,10 @@ module lab6_top (
 
   logic [11:0] h_16;
   logic [11:0] v_16;
+  // logic [11:0] h_16_div_4;
 
-  assign h_16 = {hdata[11:4], 4'b0000};
+  assign h_16 = {2'b00, hdata[11:4], 2'b00};
+  // assign h_16_div_4 = {}
   assign v_16 = {vdata[11:4], 4'b0000};
   assign blk_r_addr = h_16 + 50 * v_16;
   
