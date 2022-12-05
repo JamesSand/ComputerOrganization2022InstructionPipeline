@@ -670,6 +670,7 @@ module lab6_top (
 
 // h stands for horizontal 800
 // v stands for vertical 600
+// h = x, v = y
 
   // 图像输出演示，分辨率 800x600@75Hz，像素时钟为 50MHz
   logic [11:0] hdata;
@@ -687,7 +688,7 @@ module lab6_top (
 
   // assign blk_r_addr = {vga_r_addr[18:4], 4'b00};
   
-  assign vga_calc_addr = (vga_x >> 2) + ((vga_y>>2) << 7) + ((vga_y>>2) << 6) + ((vga_y>>2) << 3);
+  assign vga_calc_addr = (hdata >> 2) + ((vdata>>2) << 7) + ((vdata>>2) << 6) + ((vdata>>2) << 3);
   assign blk_r_addr = {vga_calc_addr[18:4], 4'b00};
 
   blk_controller u_blk_controller (
