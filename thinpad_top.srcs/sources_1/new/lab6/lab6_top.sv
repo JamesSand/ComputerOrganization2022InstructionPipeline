@@ -123,8 +123,8 @@ module lab6_top (
   logic sys_rst;
 
   // assign sys_clk = clk_10M;
-  assign sys_clk = clk_100M;
-  assign sys_rst = reset_of_clk100M;
+  assign sys_clk = clk_50M;
+  assign sys_rst = reset_of_clk50M;
 
   // 本实验不使用 CPLD 串口，禁用防止�?�线冲突
   assign uart_rdn = 1'b1;
