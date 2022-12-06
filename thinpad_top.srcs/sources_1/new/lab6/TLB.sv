@@ -23,7 +23,7 @@ always_comb begin
     for (i = 0; i < 16; i++) begin
         if (tlb_vpn_i == TLB_vpn_table_reg[i]) begin
             tlb_ppn_o = TLB_ppn_table_reg[i];
-            tlb_hit_o = 1'b0;
+            tlb_hit_o = 1'b1;
         end
     end
 end
