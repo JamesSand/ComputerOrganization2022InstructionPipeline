@@ -22,6 +22,7 @@ module mtime_controller #(
 
     reg [63:0] mtime_reg;
     reg [63:0] mtime_cmp_reg;
+    reg [63:0] mtime_counter_reg;
 
     typedef enum logic {
         STATE_IDLE = 0,
@@ -34,6 +35,7 @@ module mtime_controller #(
             state <= STATE_IDLE;
             mtime_reg <= 0;
             mtime_cmp_reg <= 0;
+            mtime_counter_reg <= 64'b0;
             wb_ack_o <= 0;
             wb_dat_o <= 0;
             mtime_exceed_o <= 0;
@@ -70,11 +72,14 @@ module mtime_controller #(
 
                     // timer
                     else if (mtime_cmp_reg > 0) begin
-                        if (mtime_reg >= mtime_cmp_reg * 4'd10) begin
+                        if (mtime_reg >= mtime_cmp_reg) begin
                             mtime_exceed_o <= 1;
+                        end else if (mtime_counter_reg == 64'd9) begin
+                            mtime_counter_reg <= 64'b0;
+                            mtime_reg <= mtime_reg + 64'b1;
                         end else begin
                             mtime_exceed_o <= 0;
-                            mtime_reg <= mtime_reg + 64'b1;
+                            mtime_counter_reg <= mtime_counter_reg + 64'b1;
                         end
                     end
                 end
