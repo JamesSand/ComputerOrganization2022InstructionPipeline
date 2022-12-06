@@ -70,7 +70,7 @@ module mtime_controller #(
 
                     // timer
                     else if (mtime_cmp_reg > 0) begin
-                        if (mtime_reg >= mtime_cmp_reg) begin
+                        if (mtime_reg >= mtime_cmp_reg * 4'd10) begin
                             mtime_exceed_o <= 1;
                         end else begin
                             mtime_exceed_o <= 0;
