@@ -155,6 +155,40 @@ always_comb begin
                 alu_y_reg = 32;
         end
         end
+        
+        4'b1111: begin 
+                case(alu_b[7:0])
+                0: alu_y_reg[7:0] = alu_a[7:0];
+                1: alu_y_reg[7:0] = alu_a[15:8];
+                2: alu_y_reg[7:0] = alu_a[23:16];
+                3: alu_y_reg[7:0] = alu_a[31:24];
+                default: alu_y_reg[7:0] = 0;
+                endcase
+
+                case(alu_b[15:8])
+                0: alu_y_reg[15:8] = alu_a[7:0];
+                1: alu_y_reg[15:8] = alu_a[15:8];
+                2: alu_y_reg[15:8] = alu_a[23:16];
+                3: alu_y_reg[15:8] = alu_a[31:24];
+                default: alu_y_reg[15:8] = 0;
+                endcase
+
+                case(alu_b[23:16])
+                0: alu_y_reg[23:16] = alu_a[7:0];
+                1: alu_y_reg[23:16] = alu_a[15:8];
+                2: alu_y_reg[23:16] = alu_a[23:16];
+                3: alu_y_reg[23:16] = alu_a[31:24];
+                default: alu_y_reg[23:16] = 0;
+                endcase
+
+                case(alu_b[31:24])
+                0: alu_y_reg[31:24] = alu_a[7:0];
+                1: alu_y_reg[31:24] = alu_a[15:8];
+                2: alu_y_reg[31:24] = alu_a[23:16];
+                3: alu_y_reg[31:24] = alu_a[31:24];
+                default: alu_y_reg[31:24] = 0;
+                endcase
+        end
         default: begin alu_y_reg = 32'b0;end
         endcase
 end
