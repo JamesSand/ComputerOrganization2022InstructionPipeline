@@ -1,3 +1,10 @@
+## 2022 Fall THU 计算机组成原理流水线
+
+流水线的 Verilog 代码在[这里](thinpad_top.srcs\sources_1\new\lab6\pipeline_master.sv)
+
+如果实现了 VGA，如果想用 VGA 播放视频，可以参考[这里](vga_video_utils\readme.md)
+
+
 Thinpad 模板工程
 ---------------
 
