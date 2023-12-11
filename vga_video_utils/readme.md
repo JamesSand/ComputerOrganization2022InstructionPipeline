@@ -17,3 +17,11 @@ Note:
 
 如果想播放更长或者更流畅的视频，可以考虑播放黑白视频，这样一个像素只需要一个 bit 而不是 rgb8 了
 
+这个脚本当时跑的一个 demo video，左边是用 vga 跑的，右边是原始视频
+
+https://github.com/JamesSand/ComputerOrganization2022InstructionPipeline/assets/98897204/81507551-5afa-449c-9fef-296823ddc2f0
+
+
+
+
+
